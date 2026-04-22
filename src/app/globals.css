@@ -1,3 +1,30 @@
+/* @import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
+
 @import "tailwindcss";
 
 :root {
@@ -23,4 +50,64 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.bg-layer {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.bg-layer-1 {
+  z-index: 1;
+  background-image: url("https://res.cloudinary.com/dcu47l2uc/image/upload/v1776844641/01.05-bg_d4szot.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 1;
+}
+
+.bg-layer-2 {
+  z-index: 2;
+  background-image: url("https://res.cloudinary.com/dcu47l2uc/image/upload/v1776844657/01.05-bottom-right_mxvuhy.gif");
+  width: 30%;
+  height: 30%;
+  position: fixed;
+  bottom: 12px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.bg-layer-3 {
+  z-index: 3;
+  background-image: url("https://res.cloudinary.com/dcu47l2uc/image/upload/v1776844656/01.05-bottom-left_ffmcmk.gif");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 30%;
+  position: fixed;
+  height: 30%;
+  bottom: 10px;
+  right: 20px;
+  background-position: 100% 100%;
+}
+
+.bg-layer-4 {
+  z-index: 4;
+  position: fixed;
+  background-size: contain;
+  background-image: url("https://res.cloudinary.com/dcu47l2uc/image/upload/v1776844670/01.05-top-left_eb0zmz.png");
+  top: 80px;
+  right: 25px;
+  background-repeat: no-repeat;
+}
+
+.bg-layer-5 {
+  z-index: 5;
+  background-image: url("https://res.cloudinary.com/dcu47l2uc/image/upload/v1776844672/01.05-top-right_rygc5r.png");
+  background-size: contain;
+  background-position: bottom right;
+  background-repeat: no-repeat;
 }

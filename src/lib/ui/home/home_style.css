@@ -1,0 +1,51 @@
+#home-page {
+  position: relative;
+  z-index: 10;
+  top: 80px;
+  padding-bottom: 30px;
+  width: 100%;
+}
+.home-page-container {
+  max-width: 1082px;
+   width: 100%;
+  box-sizing: border-box;
+  margin: 50px auto 0;
+  .content-item {
+    max-width: 329px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s ease-in;
+    background-color: #fff;
+    cursor: pointer;
+    .content-item-img {
+      width: 100%;
+      min-height: 200px;
+      max-height: 300px;
+      overflow: hidden;
+      display: flex;
+      position: relative;
+      img {
+        border-radius: 10px 10px 0 0;
+      }
+    }
+    .title-content {
+      padding: 0px 10px 10px 10px;
+      .title {
+        padding: 11px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        line-height: 26px;
+      }
+      .content {
+        font-size: 16px;
+        color: #686868;
+        line-height: 27px;
+        max-height: 82px;
+        overflow: hidden;
+        white-space: pre-line;
+      }
+    }
+  }
+}
