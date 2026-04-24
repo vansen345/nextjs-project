@@ -3,6 +3,10 @@ export const API_CONFIG = {
 
   ENDPOINTS: {
     HOME: "/home/getListHome",
-    DETAIL: "/home/getDetail"
+    DETAIL: "/home/getDetail",
+    SENDMAIL:"/email/send",
+    SENTOTP:"/email/sendOtp",
+    VERIFYTOTP:"/email/verifyOtp",
+    REGISTER:"/register/registerUser"
   },
 };

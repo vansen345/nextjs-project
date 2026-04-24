@@ -1,0 +1,22 @@
+import { baseQuery } from "@/lib/baseQuery";
+import { HomeItem } from "@/model/home_type";
+import { BaseResponseObject } from "@/model/reponse_type";
+import { createApi } from "@reduxjs/toolkit/query/react";
+
+export const detailApi = createApi({
+    reducerPath:"detailApi",
+    baseQuery,
+    tagTypes:["Detail"],
+    endpoints:(builder)=>({
+        detailPieper: builder.mutation<BaseResponseObject<HomeItem>,{PV325:string, PP300:number,FT300:number}>({
+            query:({PV325,PP300,FT300})=>({
+                url:"/detail",
+                method:"POST",
+                body:{PV325,PP300,FT300}
+            })
+        })
+    })
+});
+export const {
+    useDetailPieperMutation,
+}= detailApi;

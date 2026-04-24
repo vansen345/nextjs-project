@@ -1,10 +1,12 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 export const useHeaderController = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = (path: string) => {
     if (pathname === `/${path}`) {
@@ -19,5 +21,11 @@ export const useHeaderController = () => {
     return pathname === `/${path}` ? "button-active" : "button-inactive";
   };
 
-  return { handleClick, getColor2 };
+  const onOpenRegister = () => {
+    setIsModalOpen(true);
+  }
+  const onCloseRegister = () =>
+    setIsModalOpen(false);
+
+  return { handleClick, getColor2, onOpenRegister,onCloseRegister, isModalOpen };
 };

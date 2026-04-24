@@ -1,11 +1,10 @@
 "use client";
 
-
-import { Masonry } from "antd";
-import { getDecryptedTitle } from "../../../model/home_type";
-
 import { useHomePageController } from "@/features/home/home_controller";
 import { useDocumentTitle } from "@/lib/hook/useDocumentTitle";
+import DetailScreen from "@/lib/ui/detail/detail_screen";
+import { Masonry } from "antd";
+import { getDecryptedTitle } from "../../../model/home_type";
 import "./home_style.css";
 
 function HomePageScreen() {
@@ -14,11 +13,7 @@ function HomePageScreen() {
   const {
     list,
     isLoading,
-    isModalOpen,
-    selectedItem,
     handleItemClick,
-    handleOk,
-    handleCancel,
     hasMore,
     bottomRef,
   } = useHomePageController();
@@ -48,23 +43,14 @@ function HomePageScreen() {
             </div>
           )}
         />
-
-        {/* element ẩn cuối list, trigger IntersectionObserver */}
         <div ref={bottomRef} style={{ height: 20 }} />
-
         {isLoading && list.length > 0 && hasMore && (
           <div style={{ textAlign: "center", padding: 16 }}>
             Loading more...
           </div>
         )}
       </div>
-
-      {/* <DetailScreen
-        isModalOpen={isModalOpen}
-        item={selectedItem}
-        handleOk={handleOk}
-        handleCancel={handleCancel}
-      /> */}
+      <DetailScreen />
     </section>
   );
 }

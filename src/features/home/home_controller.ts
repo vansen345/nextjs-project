@@ -1,8 +1,9 @@
 "use client";
 
+import { setIsModalOpen, setSelectedItem } from "@/features/detail/detail_redux_slice";
 import { getDecryptedTitle, HomeItem } from "@/model/home_type";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import slugify from "slugify";
 import { useLazyGetHomeListQuery } from "./home_api";
 
@@ -12,8 +13,8 @@ export const useHomePageController = () => {
     const [list, setList] = useState<HomeItem[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<HomeItem | undefined>();
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [selectedItem, setSelectedItem] = useState<HomeItem | undefined>();
 
     const isLoadingRef = useRef(false);
     const offsetRef = useRef(0);
@@ -22,7 +23,9 @@ export const useHomePageController = () => {
     const bottomRef = useRef<HTMLDivElement>(null);
 
     const [trigger] = useLazyGetHomeListQuery();
-    const navigate = useRouter();
+    // const navigate = useRouter();
+
+    const dispatch = useDispatch();
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
@@ -85,23 +88,20 @@ export const useHomePageController = () => {
     }, [fetchList]);
 
     const handleItemClick = (item: HomeItem) => {
-        setSelectedItem(item);
-        setIsModalOpen(true);
+
+        dispatch(setSelectedItem(item));
+        dispatch(setIsModalOpen(true));
         const slug = `${slugify(getDecryptedTitle(item?.PV301), { lower: true, locale: "vi" })}-${item.PV325}.html`;
-        navigate.push(`/${slug}`);
+        window.history.pushState(null, "", `/${slug}`);
     };
 
-    const handleOk = () => setIsModalOpen(false);
-    const handleCancel = () => { setIsModalOpen(false); navigate.push("/"); };
+    // const handleOk = () => setIsModalOpen(false);
+    // const handleCancel = () => { setIsModalOpen(false); navigate.push("/"); };
 
     return {
         list,
         isLoading,
-        isModalOpen,
-        selectedItem,
         handleItemClick,
-        handleOk,
-        handleCancel,
         hasMore,
         bottomRef,
     };
