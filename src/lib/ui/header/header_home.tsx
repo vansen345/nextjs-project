@@ -3,6 +3,7 @@
 import {
   Avatar,
   Button,
+  Dropdown,
   Flex,
   Image,
   Input,
@@ -14,6 +15,8 @@ import { useEffect, useState } from "react";
 
 import { useHeaderController } from "@/features/header/header_controller";
 import { useLazyGetHomeListQuery } from "@/features/home/home_api";
+import { UserOutlined } from "@ant-design/icons";
+import LoginScreen from "../login/login_screen";
 import RegisterScreen from "../register/register_screen";
 import "./header_style.css";
 
@@ -25,14 +28,16 @@ function Header() {
     handleClick,
     getColor2,
     onOpenRegister,
-    onCloseRegister,
-    isModalOpen,
+    onOpenLogin,
+    avatar,
+    isLoggedIn,
   } = useHeaderController();
   const router = useRouter();
   const [fetchHome] = useLazyGetHomeListQuery();
 
   useEffect(() => {
     document.body.classList.add("hydrated");
+    
   }, []);
 
   const handleLogoClick = () => {
@@ -88,6 +93,7 @@ function Header() {
             >
               Tạo bài Piep
             </Button>
+            
             <Tooltip>
               <Button
                 shape="circle"
@@ -105,20 +111,43 @@ function Header() {
               />
             </Tooltip>
             <Tooltip>
-              <Avatar
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "1",
+                      label: isLoggedIn ? "Profile" : "Đăng ký",
+                      onClick: isLoggedIn ? () => {} : onOpenRegister,
+                    },
+                    {
+                      key: "2",
+                      label: isLoggedIn ? "Đăng xuất" : "Đăng nhập",
+                      onClick: isLoggedIn ? () => {} : onOpenLogin,
+                    },
+                  ],
+                }}
+                trigger={["hover"]}
+              >
+                <Avatar
+                  size="large"
+                  style={{ cursor: "pointer" }}
+                  src={isLoggedIn && avatar ? avatar : undefined}
+                  icon={!isLoggedIn ? <UserOutlined /> : undefined}
+                />
+              </Dropdown>
+              {/* <Avatar
                 style={{cursor:"pointer"}}
                 size={40}
-                src="https://res.cloudinary.com/dcu47l2uc/image/upload/v1776849220/copy_of_673761387_1670632933954108_3830695161187199172_n_srcopc_86fa1c.jpg"
+                src=""
                 onClick={onOpenRegister}
-              />
+              /> */}
+              {/* <Avatar size="large" style={{cursor:"pointer"}} icon={<UserOutlined />} /> */}
             </Tooltip>
           </div>
         </div>
       </Flex>
-      <RegisterScreen
-        handleCancel={onCloseRegister}
-        isModalOpen={isModalOpen}
-      />
+      <RegisterScreen />
+      <LoginScreen />
     </>
   );
 }

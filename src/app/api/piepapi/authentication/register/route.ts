@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const { email } = body;
     const token = request.headers.get("authorization") || "";
 
-    const data = await callApi({
+    const {data} = await callApi({
         endpoint: API_CONFIG.ENDPOINTS.REGISTER,
         method: "POST",
         body: { email },

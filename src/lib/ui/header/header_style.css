@@ -49,30 +49,40 @@
       }
     }
   }
-.button-icons-header {
+  .button-icons-header {
     display: flex;
     align-items: center;
     gap: 7px;
     margin-left: 30px;
     .button-create {
-      background-color: rgba(243, 73, 91, 0.1);
       color: #f3495b;
+      background-color: #f3495b1a;
       border: none;
       margin-right: 18px;
+      border-radius: 5px;
+      padding: 5px 10px 5px 10px;
+      transition: none !important;
+      &:hover, &:focus, &:active {
+        color: #f3495b !important;
+        background-color: #f3495b1a !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
     }
     button {
       min-height: 40px;
-      min-width: 40px!important;
+      min-width: 40px !important;
     }
     .ant-btn {
       min-height: 40px;
-      min-width: 40px!important;
+      min-width: 40px !important;
       /* border-radius: 50%!important; */
     }
     .ant-btn-circle {
       min-height: 40px;
-      min-width: 40px!important;
-      border-radius: 50%!important;
+      min-width: 40px !important;
+      border-radius: 50% !important;
     }
     .button-active {
       background-color: rgba(243, 73, 91, 0.1);

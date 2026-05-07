@@ -1,24 +1,24 @@
-"use-client";
-
-import { useRegisterController } from "@/features/register/register_controller";
-import { Button, ConfigProviderProps, Input, Modal } from "antd";
+import { useLoginController } from "@/features/login/login_controller";
+import { Button, Input, Modal } from "antd";
+import { SizeType } from "antd/es/config-provider/SizeContext";
 import { useState } from "react";
 
-type SizeType = ConfigProviderProps["componentSize"];
-
-function RegisterScreen() {
+function LoginScreen() {
   const {
     valueEmail,
+    isModalOpenLogin,
+    isOtpSent,
+    valueOtp,
+    onCloseLogin,
+    onSendOtpLogin,
     onChangeEmail,
-    onRegister,
-    onCloseRegister,
-    isModalOpenRegister,
-  } = useRegisterController();
+    onverifyOtpLogin,
+  } = useLoginController();
   const [size] = useState<SizeType>("large");
   return (
     <Modal
-      open={isModalOpenRegister}
-      onCancel={onCloseRegister}
+      open={isModalOpenLogin}
+      onCancel={onCloseLogin}
       width={680}
       footer={null}
       style={{ outline: "none" }}
@@ -38,10 +38,10 @@ function RegisterScreen() {
             width: "250px",
             height: "35px",
           }}
-          placeholder="Nhập email"
+          placeholder={isOtpSent ? "Nhập Otp" : "Nhập email"}
           className="input-header"
           onChange={onChangeEmail}
-          value={valueEmail}
+          value={isOtpSent ? valueOtp : valueEmail}
         />
       </div>
       <div>
@@ -53,12 +53,13 @@ function RegisterScreen() {
           }}
           size={size}
           className="button-create hidden md:flex"
-          onClick={onRegister}
+          onClick={isOtpSent ? onverifyOtpLogin : onSendOtpLogin}
         >
-          Send
+          {isOtpSent ? "Xác nhận" : "Gửi mã"}
         </Button>
       </div>
     </Modal>
   );
 }
-export default RegisterScreen;
+
+export default LoginScreen;

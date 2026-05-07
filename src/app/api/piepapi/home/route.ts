@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   console.log(`[PROXY] Calling: ${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.HOME}?limit=${limit}&offset=${offset}`);
 
-  const data = await callApi({
+  const {data} = await callApi({
     endpoint: API_CONFIG.ENDPOINTS.HOME,
     query: { limit, offset },
     token,

@@ -1,3 +1,4 @@
+
 import { API_CONFIG } from "./config_api";
 
 type ApiOptions<TQuery = Record<string, unknown>, TBody = unknown> = {
@@ -6,6 +7,7 @@ type ApiOptions<TQuery = Record<string, unknown>, TBody = unknown> = {
   query?: TQuery;
   body?: TBody;
   token?: string;
+  cookie?: string;
 };
 
 const colors = {
@@ -17,7 +19,9 @@ const colors = {
   cyan: "\x1b[36m",
 };
 
-export const callApi = async< 
+
+
+export const callApi = async<
   TResponse = unknown,
   TQuery = Record<string, unknown>,
   TBody = unknown
@@ -27,7 +31,8 @@ export const callApi = async<
   query,
   body,
   token,
-}: ApiOptions<TQuery, TBody>): Promise<TResponse> => {
+  cookie,
+}: ApiOptions<TQuery, TBody>): Promise<{ data: TResponse; setCookie: string | null }> => {
   const queryString = query
     ? new URLSearchParams(query as Record<string, string>).toString()
     : "";
@@ -44,10 +49,25 @@ export const callApi = async<
     headers: {
       "Content-Type": "application/json",
       Authorization: token || "",
+      Cookie: cookie || "",
     },
     body: method !== "GET" ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(30000),
   });
 
-  return response.json();
+  const setCookie = response.headers.get("set-cookie");
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API error ${response.status}: ${text.slice(0, 200)}`);
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (contentType?.includes("application/json")) {
+    const data = await response.json();
+    return { data, setCookie };
+  }
+
+  const text = await response.text();
+  throw new Error(`Expected JSON but got ${contentType}: ${text.slice(0, 200)}`);
 };
