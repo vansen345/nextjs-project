@@ -25,6 +25,7 @@ export const useHeaderController = () => {
 
   useEffect(() => {
     const checkSesstion = async () => {
+      if(!isLoggedIn)return;
       try {
         const response = await getInfoLogin().unwrap();
         if (response.status === "true" && response.elements) {
