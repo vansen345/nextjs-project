@@ -29,6 +29,7 @@ function Header() {
     getColor2,
     onOpenRegister,
     onOpenLogin,
+    onLogout,
     avatar,
     isLoggedIn,
   } = useHeaderController();
@@ -122,7 +123,7 @@ function Header() {
                     {
                       key: "2",
                       label: isLoggedIn ? "Đăng xuất" : "Đăng nhập",
-                      onClick: isLoggedIn ? () => {} : onOpenLogin,
+                      onClick: isLoggedIn ? onLogout : onOpenLogin,
                     },
                   ],
                 }}
