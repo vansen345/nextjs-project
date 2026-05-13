@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import slugify from "slugify";
 import { useLazyGetHomeListQuery } from "./home_api";
 
+
 const LIMIT = 10;
 
 export const useHomePageController = () => {
@@ -22,9 +23,9 @@ export const useHomePageController = () => {
     const isInitializedRef = useRef(false); // ← thêm
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    const [trigger] = useLazyGetHomeListQuery();
-    // const navigate = useRouter();
 
+    const [trigger] = useLazyGetHomeListQuery();
+    const hasFetchedRef = useRef(false);
     const dispatch = useDispatch();
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
@@ -56,21 +57,17 @@ export const useHomePageController = () => {
     }, [trigger]);
 
     useEffect(() => {
-        if (!isInitializedRef.current) {
-            isInitializedRef.current = true;
-            fetchList(0, true);
-        }
+        if (hasFetchedRef.current) return;
+        hasFetchedRef.current = true;
+
+        setList([]); 
+        setHasMore(true);
+        offsetRef.current = 0;
+        hasMoreRef.current = true;
+
+        fetchList(0, true);
     }, [fetchList]);
 
-    useEffect(() => {
-        if (list.length > 0 && !isLoading && hasMoreRef.current) {
-            if (window.innerHeight >= document.documentElement.scrollHeight - 50) {
-                fetchList(offsetRef.current);
-            }
-        }
-    }, [list, isLoading, fetchList]);
-
-    // Scroll listener
     useEffect(() => {
         const handleScroll = () => {
             if (
@@ -86,6 +83,23 @@ export const useHomePageController = () => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, [fetchList]);
+
+    // Scroll listener
+    // useEffect(() => {
+    //     const handleScroll = () => {
+    //         if (
+    //             window.innerHeight + window.scrollY >=
+    //             document.documentElement.scrollHeight - 50
+    //         ) {
+    //             if (hasMoreRef.current && !isLoadingRef.current) {
+    //                 fetchList(offsetRef.current);
+    //             }
+    //         }
+    //     };
+
+    //     window.addEventListener("scroll", handleScroll);
+    //     return () => window.removeEventListener("scroll", handleScroll);
+    // }, [fetchList]);
 
     const handleItemClick = (item: HomeItem) => {
 

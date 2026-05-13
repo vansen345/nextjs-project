@@ -20,7 +20,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-redux": "^9.2.0",
-    "slugify": "^1.6.9"
+    "slugify": "^1.6.9",
+    "swiper": "^12.1.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

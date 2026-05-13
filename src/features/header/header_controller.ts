@@ -15,16 +15,18 @@ export const useHeaderController = () => {
   const isLoggedIn = !!session;
 
   const handleClick = (path: string) => {
-    if (pathname === `/${path}`) {
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    if (pathname === normalizedPath) {
       router.push("/");
     } else {
-      router.push(`/${path}`);
+      router.push(normalizedPath);
     }
   };
 
   const getColor2 = (path: string): string => {
-    if (path === "/") return pathname === "/" ? "button-active" : "button-inactive";
-    return pathname === `/${path}` ? "button-active" : "button-inactive";
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    if (normalizedPath === "/") return pathname === "/" ? "button-active" : "button-inactive";
+    return pathname === normalizedPath ? "button-active" : "button-inactive";
   };
 
   const onOpenRegister = () => dispatch(setIsModalOpenRegiser(true));
