@@ -164,7 +164,7 @@ function ChatScreen() {
               placeholder="Nhập tin nhắn..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => {
+              onPressEnter={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   handleSend();
