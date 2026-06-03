@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useHeaderController } from "@/features/header/header_controller";
 import { useLazyGetHomeListQuery } from "@/features/home/home_api";
 import i18n from "@/i18n";
+import { useAuth } from "@/lib/hook/useAuth";
 import { UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import CreatePiepScreen from "../create_piep/create_piep";
@@ -39,6 +40,8 @@ function Header() {
     NV126,
     isLoggedIn,
   } = useHeaderController();
+  
+  const { FO100 } = useAuth();
   const router = useRouter();
   const [fetchHome] = useLazyGetHomeListQuery();
 
@@ -48,7 +51,7 @@ function Header() {
 
   const handleLogoClick = () => {
     router.push("/");
-    fetchHome({ limit: 10, offset: 0 });
+    fetchHome({ limit: 10, offset: 0,FO100: FO100 || 0 });
   };
 
   return (
