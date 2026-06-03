@@ -12,11 +12,16 @@ export const authOptions: NextAuthOptions = {
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.otp) return null;
 
+                const parts = credentials.email.split('@');
+                const normalizedEmail = parts.length === 2
+                    ? `${parts[0]?.split('+')[0]}@${parts[1]}`
+                    : credentials.email;
+
                 const res = await fetch(`${process.env.API_BASE_URL}/email/verifyOtp`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        email: credentials.email,
+                        email: normalizedEmail, // ← dùng normalized
                         otp: credentials.otp,
                     }),
                 });
@@ -27,14 +32,16 @@ export const authOptions: NextAuthOptions = {
                     const profileRes = await fetch(`${process.env.API_BASE_URL}/login/getInfoUserLogin`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: credentials.email }),
+                        body: JSON.stringify({ email: credentials.email }), // ← dùng normalized
                     });
                     const profile = await profileRes.json();
 
                     return {
-                        id: credentials.email,
+                        id: profile.elements?.id || credentials.email,
                         email: credentials.email,
-                        avatar: profile.elements?.avatar || "",
+                        NV126: profile.elements?.NV126 || "",
+                        NV106: profile.elements?.NV106 || "",
+                        FO100: profile.elements?.FO100 || 0,
                     };
                 }
 
@@ -45,12 +52,18 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.avatar = user.avatar;
+                token.NV126 = user.NV126;
+                token.NV106 = user.NV106;
+                token.id = user.id;
+                token.FO100 = user.FO100;
             }
             return token;
         },
         async session({ session, token }) {
-            session.user.avatar = token.avatar as string;
+            session.user.NV126 = token.NV126 as string;
+            session.user.NV106 = token.NV106 as string;
+            session.user.id = token.id as string;
+            session.user.FO100 = token.FO100 as number;
             return session;
         },
     },

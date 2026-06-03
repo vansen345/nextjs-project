@@ -1,11 +1,15 @@
 "use client";
 
 import { setIsModalOpen, setSelectedItem } from "@/features/detail/detail_redux_slice";
+import NProgress from '@/lib/nprogress';
 import { getDecryptedTitle, HomeItem } from "@/model/home_type";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { RootState } from "@/store";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import slugify from "slugify";
+import { setShouldRefreshHome } from "../create_piep/create_piep_redux_slice";
 import { useLazyGetHomeListQuery } from "./home_api";
+
 
 
 const LIMIT = 10;
@@ -13,14 +17,10 @@ const LIMIT = 10;
 export const useHomePageController = () => {
     const [list, setList] = useState<HomeItem[]>([]);
     const [hasMore, setHasMore] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    // const [isModalOpen, setIsModalOpen] = useState(false);
-    // const [selectedItem, setSelectedItem] = useState<HomeItem | undefined>();
 
     const isLoadingRef = useRef(false);
     const offsetRef = useRef(0);
     const hasMoreRef = useRef(true);
-    const isInitializedRef = useRef(false); // ← thêm
     const bottomRef = useRef<HTMLDivElement>(null);
 
 
@@ -28,11 +28,15 @@ export const useHomePageController = () => {
     const hasFetchedRef = useRef(false);
     const dispatch = useDispatch();
 
+    const shouldRefresh = useSelector((state: RootState) => state.createPiep.shouldRefreshHome);
+
+
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
 
         isLoadingRef.current = true;
-        setIsLoading(true);
+        NProgress.start();
+        // setIsLoading(true);
 
         try {
             const { data } = await trigger({ limit: LIMIT, offset: newOffset });
@@ -52,21 +56,40 @@ export const useHomePageController = () => {
             }
         } finally {
             isLoadingRef.current = false;
-            setIsLoading(false);
+            NProgress.done();
+            // setIsLoading(false);
         }
     }, [trigger]);
 
+   
+
+    // useEffect(() => {
+    //     if (hasFetchedRef.current) return;
+    //     hasFetchedRef.current = true;
+
+    //     setList([]); 
+    //     setHasMore(true);
+    //     offsetRef.current = 0;
+    //     hasMoreRef.current = true;
+
+    //     fetchList(0, true);
+    // }, [fetchList]);
+
+
     useEffect(() => {
-        if (hasFetchedRef.current) return;
-        hasFetchedRef.current = true;
+        if (!hasFetchedRef.current || shouldRefresh) {
+            hasFetchedRef.current = true;
+            startTransition(() => {
+                setList([]);
+                setHasMore(true);
+                offsetRef.current = 0;
+                hasMoreRef.current = true;
+                fetchList(0, true);
+                if (shouldRefresh) dispatch(setShouldRefreshHome(false));
+            });
+        }
+    }, [fetchList, shouldRefresh, dispatch]);
 
-        setList([]); 
-        setHasMore(true);
-        offsetRef.current = 0;
-        hasMoreRef.current = true;
-
-        fetchList(0, true);
-    }, [fetchList]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -84,22 +107,6 @@ export const useHomePageController = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [fetchList]);
 
-    // Scroll listener
-    // useEffect(() => {
-    //     const handleScroll = () => {
-    //         if (
-    //             window.innerHeight + window.scrollY >=
-    //             document.documentElement.scrollHeight - 50
-    //         ) {
-    //             if (hasMoreRef.current && !isLoadingRef.current) {
-    //                 fetchList(offsetRef.current);
-    //             }
-    //         }
-    //     };
-
-    //     window.addEventListener("scroll", handleScroll);
-    //     return () => window.removeEventListener("scroll", handleScroll);
-    // }, [fetchList]);
 
     const handleItemClick = (item: HomeItem) => {
 
@@ -109,12 +116,9 @@ export const useHomePageController = () => {
         window.history.pushState(null, "", `/${slug}`);
     };
 
-    // const handleOk = () => setIsModalOpen(false);
-    // const handleCancel = () => { setIsModalOpen(false); navigate.push("/"); };
-
     return {
         list,
-        isLoading,
+        // isLoading,
         handleItemClick,
         hasMore,
         bottomRef,

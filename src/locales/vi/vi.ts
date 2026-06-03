@@ -1,0 +1,28 @@
+const vi = {
+    logout: "Đăng xuất",
+    login: "Đăng nhập",
+    register: "Đăng ký",
+    send_message: "Gửi tin nhắn",
+    home: "Trang chủ",
+    time_today: 'Hôm nay',
+    time_yesterday: 'Hôm qua',
+    time_sunday: 'Chủ nhật',
+    time_monday: 'Thứ hai',
+    time_tuesday: 'Thứ ba',
+    time_wednesday: 'Thứ tư',
+    time_thursday: 'Thứ năm',
+    time_friday: 'Thứ sáu',
+    time_saturday: 'Thứ bảy',
+    create_piep: " Tạo bài Piep",
+    text_profile: "Trang cá nhân",
+    title_create: "Tiêu đề",
+    content_create: "Nội dung",
+    upload_img_create: "Hình ảnh",
+    submit_post_create: "Đăng bài",
+    time_just_now: 'Vừa xong',
+    time_minute_ago: 'phút trước',
+    time_hour_ago: 'giờ trước',
+    time_day_ago: 'ngày trước',
+}
+
+export default vi

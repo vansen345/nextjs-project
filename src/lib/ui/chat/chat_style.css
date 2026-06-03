@@ -11,4 +11,22 @@
       height: 35px;
     }
   }
+  .detail-coversation {
+    position: relative;
+    overflow: hidden;
+  }
+  .chat-list {
+    background-color: #fff;
+    overflow-y: auto;
+    height: 100%;
+    border-radius: 10px 10px 0 0;
+  }
+  .input-chat {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 10;
+    background: #fff; 
+    min-height: 72px;
+  }
 }

@@ -15,7 +15,10 @@ import { useEffect, useState } from "react";
 
 import { useHeaderController } from "@/features/header/header_controller";
 import { useLazyGetHomeListQuery } from "@/features/home/home_api";
+import i18n from "@/i18n";
 import { UserOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
+import CreatePiepScreen from "../create_piep/create_piep";
 import LoginScreen from "../login/login_screen";
 import RegisterScreen from "../register/register_screen";
 import "./header_style.css";
@@ -23,6 +26,8 @@ import "./header_style.css";
 type SizeType = ConfigProviderProps["componentSize"];
 
 function Header() {
+  const { t } = useTranslation(undefined, { i18n });
+  const currentLang = i18n.language;
   const [size] = useState<SizeType>("large");
   const {
     handleClick,
@@ -30,7 +35,8 @@ function Header() {
     onOpenRegister,
     onOpenLogin,
     onLogout,
-    avatar,
+    onOpenCreatePiep,
+    NV126,
     isLoggedIn,
   } = useHeaderController();
   const router = useRouter();
@@ -38,7 +44,6 @@ function Header() {
 
   useEffect(() => {
     document.body.classList.add("hydrated");
-    
   }, []);
 
   const handleLogoClick = () => {
@@ -48,14 +53,28 @@ function Header() {
 
   return (
     <>
-      <Flex align="center" className="header">
+      {/* <div className="loading-home">
+        <Image
+          src="https://res.cloudinary.com/dcu47l2uc/image/upload/v1780042212/loading-home_u6wy8n.gif"
+          alt=""
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "hue-rotate(30deg)",
+          }}
+        />
+      </div> */}
+      <Flex align="center" className="header shadow-md">
         <div className="header-content">
           <div className="logo-search">
-            <span>
+            <span className="shrink-0">
               <Image
                 src="https://res.cloudinary.com/dcu47l2uc/image/upload/v1776244870/logo-piepme-header_wiho0z.png"
                 alt="Logo"
                 height={22}
+                preview={false}
+                className="cursor-pointer"
                 onClick={handleLogoClick}
               />
             </span>
@@ -65,7 +84,7 @@ function Header() {
           </div>
           <div style={{ flex: 1 }}></div>
 
-          <div className="menu-text hidden md:flex gap-4 mr-8">
+          <div className="menu-text hidden md:flex gap-4 mr-8 shrink-0">
             <p
               className={`text-header ${getColor2("/")}`}
               onClick={handleLogoClick}
@@ -91,17 +110,20 @@ function Header() {
               icon={<span className="fpme-plus"></span>}
               size={size}
               className="button-create hidden md:flex"
+              onClick={onOpenCreatePiep}
             >
-              Tạo bài Piep
+              {t("create_piep")}
             </Button>
-            
+
             <Tooltip>
-              <Button
-                shape="circle"
-                icon={<span className="fpme-piep-and-call"></span>}
-                onClick={() => handleClick("/chat")}
-                className={`button-chat hidden md:flex ${getColor2("chat")}`}
-              />
+              {isLoggedIn && (
+                <Button
+                  shape="circle"
+                  icon={<span className="fpme-piep-and-call"></span>}
+                  onClick={() => handleClick("/chat")}
+                  className={`button-chat hidden md:flex ${getColor2("chat")}`}
+                />
+              )}
             </Tooltip>
             <Tooltip>
               <Button
@@ -117,12 +139,12 @@ function Header() {
                   items: [
                     {
                       key: "1",
-                      label: isLoggedIn ? "Profile" : "Đăng ký",
+                      label: isLoggedIn ? t("text_profile") : t("register"),
                       onClick: isLoggedIn ? () => {} : onOpenRegister,
                     },
                     {
                       key: "2",
-                      label: isLoggedIn ? "Đăng xuất" : "Đăng nhập",
+                      label: isLoggedIn ? t("logout") : t("login"),
                       onClick: isLoggedIn ? onLogout : onOpenLogin,
                     },
                   ],
@@ -132,23 +154,30 @@ function Header() {
                 <Avatar
                   size="large"
                   style={{ cursor: "pointer" }}
-                  src={isLoggedIn && avatar ? avatar : undefined}
+                  src={isLoggedIn && NV126 ? NV126 : undefined}
                   icon={!isLoggedIn ? <UserOutlined /> : undefined}
                 />
               </Dropdown>
-              {/* <Avatar
-                style={{cursor:"pointer"}}
-                size={40}
-                src=""
-                onClick={onOpenRegister}
-              /> */}
-              {/* <Avatar size="large" style={{cursor:"pointer"}} icon={<UserOutlined />} /> */}
             </Tooltip>
+            <button
+              className={`cursor-pointer font-semibold ${currentLang === "vi" ? "text-[#f3495b]" : "text-black"} `}
+              onClick={() => i18n.changeLanguage("vi")}
+            >
+              VI
+            </button>
+
+            <button
+              className={`cursor-pointer font-semibold ${currentLang === "en" ? "text-[#f3495b]" : "text-black"} `}
+              onClick={() => i18n.changeLanguage("en")}
+            >
+              EN
+            </button>
           </div>
         </div>
       </Flex>
       <RegisterScreen />
       <LoginScreen />
+      <CreatePiepScreen />
     </>
   );
 }

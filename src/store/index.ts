@@ -1,3 +1,7 @@
+import { chatApi } from "@/features/chat/chat_services";
+import { commentApi } from "@/features/comment/comment_services";
+import createReducer from "@/features/create_piep/create_piep_redux_slice";
+import { creataPiepApi } from "@/features/create_piep/create_piep_services";
 import { detailApi } from "@/features/detail/detail_api";
 import detailReducer from "@/features/detail/detail_redux_slice";
 import headerReducer from "@/features/header/header_redux_slice";
@@ -13,16 +17,23 @@ export const store = configureStore({
     [detailApi.reducerPath]: detailApi.reducer,
     [registerApi.reducerPath]: registerApi.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
+    [chatApi.reducerPath]: chatApi.reducer,
+    [creataPiepApi.reducerPath]:creataPiepApi.reducer,
+    [commentApi.reducerPath]:commentApi.reducer,
     detail: detailReducer,
     header: headerReducer,
     auth: authReducer,
+    createPiep:createReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(homeApi.middleware)
       .concat(detailApi.middleware)
       .concat(registerApi.middleware)
-      .concat(loginApi.middleware),
+      .concat(loginApi.middleware)
+      .concat(chatApi.middleware)
+      .concat(creataPiepApi.middleware)
+      .concat(commentApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

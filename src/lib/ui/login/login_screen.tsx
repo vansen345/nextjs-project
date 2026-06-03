@@ -19,7 +19,7 @@ function LoginScreen() {
     <Modal
       open={isModalOpenLogin}
       onCancel={onCloseLogin}
-      width={680}
+      width={480}
       footer={null}
       style={{ outline: "none" }}
       styles={{
@@ -30,29 +30,21 @@ function LoginScreen() {
         },
       }}
     >
+      <div className="text-center text-[18px] font-bold mb-2.5" >Đăng nhập</div>
       <div className="search-header mb-3 ">
         <Input
-          style={{
-            backgroundColor: "#f4f4f4",
-            border: "none",
-            width: "250px",
-            height: "35px",
-          }}
           placeholder={isOtpSent ? "Nhập Otp" : "Nhập email"}
-          className="input-header"
+          classNames={{root:"!bg-[#f4f4f4] !border-none !h-9"}}
           onChange={onChangeEmail}
           value={isOtpSent ? valueOtp : valueEmail}
         />
       </div>
-      <div>
+      <div className="text-center">
         <Button
-          style={{
-            backgroundColor: "rgba(243, 73, 91, 0.1)",
-            color: "#f3495b",
-            border: "none",
-          }}
+          
           size={size}
-          className="button-create hidden md:flex"
+          // className="button-create hidden md:flex"
+          classNames={{root:"!bg-[rgba(243,73,91,0.1)] !text-[#f3495b] !border-none"}}
           onClick={isOtpSent ? onverifyOtpLogin : onSendOtpLogin}
         >
           {isOtpSent ? "Xác nhận" : "Gửi mã"}

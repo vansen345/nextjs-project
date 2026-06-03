@@ -8,6 +8,7 @@ type ApiOptions<TQuery = Record<string, unknown>, TBody = unknown> = {
   body?: TBody;
   token?: string;
   cookie?: string;
+  headers?: Record<string, string>;
 };
 
 const colors = {
@@ -32,6 +33,7 @@ export const callApi = async<
   body,
   token,
   cookie,
+  headers,
 }: ApiOptions<TQuery, TBody>): Promise<{ data: TResponse; setCookie: string | null }> => {
   const queryString = query
     ? new URLSearchParams(query as Record<string, string>).toString()
@@ -41,7 +43,7 @@ export const callApi = async<
 
   console.log(
     `${colors.cyan}${new Date().toLocaleTimeString()}${colors.reset} ${colors.green}${method}${colors.yellow} ${colors.red}${url}${colors.reset}`,
-    JSON.stringify(query ?? body ?? {})
+
   );
 
   const response = await fetch(url, {
@@ -50,6 +52,7 @@ export const callApi = async<
       "Content-Type": "application/json",
       Authorization: token || "",
       Cookie: cookie || "",
+      ...headers,
     },
     body: method !== "GET" ? JSON.stringify(body) : undefined,
     signal: AbortSignal.timeout(30000),
@@ -70,4 +73,36 @@ export const callApi = async<
 
   const text = await response.text();
   throw new Error(`Expected JSON but got ${contentType}: ${text.slice(0, 200)}`);
+};
+
+export const callApiUploadMedia = async<TResponse = unknown>({
+    endpoint,
+    body,
+    token,
+}: {
+    endpoint: string;
+    body: FormData;
+    token?: string;
+}): Promise<{ data: TResponse; setCookie: string | null }> => {
+    const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            Authorization: token || "",
+            // không set Content-Type để browser tự set boundary
+        },
+        body,
+        signal: AbortSignal.timeout(30000),
+    });
+
+    const setCookie = response.headers.get("set-cookie");
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`API error ${response.status}: ${text.slice(0, 200)}`);
+    }
+
+    const data = await response.json();
+    return { data, setCookie };
 };

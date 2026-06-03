@@ -1,8 +1,9 @@
-#home-page {
+/* #home-page {
   position: relative;
   z-index: 10;
   padding-bottom: 30px;
   width: 100%;
+  background-color: #f2f2f6;
 }
 .home-page-container {
   max-width: 1082px;
@@ -21,7 +22,6 @@
       width: 100%;
       min-height: 200px;
       max-height: 300px;
-      overflow: hidden;
       display: flex;
       position: relative;
       img {
@@ -47,4 +47,4 @@
       }
     }
   }
-}
+} */

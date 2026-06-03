@@ -6,6 +6,7 @@ interface HeaderState {
     searchQuery: string;
     isModalRegister: boolean;
     isModalLogin: boolean;
+    isModelCreatePiep: boolean;
 
 }
 
@@ -15,6 +16,7 @@ const initialState: HeaderState = {
     searchQuery: "",
     isModalRegister:false,
     isModalLogin: false,
+    isModelCreatePiep: false,
 };
 
 const headerSlice = createSlice({
@@ -35,9 +37,12 @@ const headerSlice = createSlice({
         },
         setIsModalOpenLogin:(state,action:PayloadAction<boolean>)=>{
             state.isModalLogin = action.payload;
+        },
+        setIsModalCreatePiep:(state, action:PayloadAction<boolean>)=>{
+            state.isModelCreatePiep = action.payload;
         }
     },
 });
 
-export const { setIsScrolled, setIsSearchOpen, setSearchQuery,setIsModalOpenRegiser,setIsModalOpenLogin } = headerSlice.actions;
+export const { setIsScrolled, setIsSearchOpen, setSearchQuery,setIsModalOpenRegiser,setIsModalOpenLogin,setIsModalCreatePiep } = headerSlice.actions;
 export default headerSlice.reducer;

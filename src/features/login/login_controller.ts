@@ -1,6 +1,7 @@
 "use client";
 
 import { RootState } from "@/store";
+import { message } from "antd";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +10,7 @@ import { useLoginUserMutation } from "./login_services";
 
 export const useLoginController = () => {
     const dispatch = useDispatch();
+    const [messageApi, contextHolder] = message.useMessage();
     const isModalOpenLogin = useSelector((state: RootState) => state.header.isModalLogin);
 
     const [valueEmail, setValueEmail] = useState("");
@@ -40,6 +42,8 @@ export const useLoginController = () => {
             setEmailForOtp(valueEmail);
             setOtpSent(true);
             setValueEmail("");
+        } else {
+            messageApi.error("Thất bại")
         }
     };
 
@@ -52,6 +56,8 @@ export const useLoginController = () => {
         });
         if (result?.ok) {
             onCloseLogin();
+        } else {
+            messageApi.error("Đăng nhập thất bại")
         }
     };
 

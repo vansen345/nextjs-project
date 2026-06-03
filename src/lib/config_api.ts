@@ -3,12 +3,21 @@ export const API_CONFIG = {
 
   ENDPOINTS: {
     HOME: "/home/getListHome",
-    DETAIL: "/home/getDetail",
+    DETAIL: "/detail/getDetail",
     SENDMAIL: "/email/send",
     SENTOTP: "/email/sendOtp",
     VERIFYTOTP: "/email/verifyOtp",
-    REGISTER: "/register/registerUser",
+    REGISTER: "/register/registerUser", 
     LOGIN: "/login/loginUser",
-    GETINFOLOGIN: "/login/getInfoUserLogin"
+    GETINFOLOGIN: "/login/getInfoUserLogin",
+    SAVE_MESSAGE: "/message/save",
+    GET_MESSAGES: "/message/list",
+    LIST_CHAT: "/message/listUserChat",
+    GET_OR_CREATE_ROOM: "/message/room",
+    POST_CREATE: "/home/createPost",
+    UPLOAD_IMG: "/home/uploadImg",
+    INSERTCOMMENT: "/comment/insertComment",
+    GETLISTCOMMENT: "/comment/listComment",
+    UPLOAD_MEDIA: "/media/uploadMedia",
   },
 };
