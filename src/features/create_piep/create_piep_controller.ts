@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsModalCreatePiep } from "../header/header_redux_slice";
 import { setShouldRefreshHome } from "./create_piep_redux_slice";
-import { useCreatePiepMutation, useUploadImgMutation, useUploadImgVideoMutation } from "./create_piep_services";
+import { useCreatePiepMutation, useUploadImgVideoMutation } from "./create_piep_services";
 
 
 export const useCreatePiepController = () => {
@@ -29,7 +29,7 @@ export const useCreatePiepController = () => {
     }
 
     const [createPiep] = useCreatePiepMutation();
-    const [uploadImg] = useUploadImgMutation();
+    // const [uploadImg] = useUploadImgMutation();
     const [uploadMedia] = useUploadImgVideoMutation();
 
     const handleOpenMedia = () => {
@@ -38,60 +38,60 @@ export const useCreatePiepController = () => {
         }, 200);
     };
 
-    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        const formData = new FormData();
+    // const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const files = Array.from(e.target.files || []);
+    //     const formData = new FormData();
 
-        await Promise.all(
-            files.map(async (file) => {
-                const compressed = await imageCompression(file, {
-                    maxSizeMB: 1,
-                    maxWidthOrHeight: 1280,
-                });
-                formData.append('image', compressed, compressed.name);
-            })
-        );
+    //     await Promise.all(
+    //         files.map(async (file) => {
+    //             const compressed = await imageCompression(file, {
+    //                 maxSizeMB: 1,
+    //                 maxWidthOrHeight: 1280,
+    //             });
+    //             formData.append('image', compressed, compressed.name);
+    //         })
+    //     );
 
-        const tempImages: ContentImg[] = files.map((file, index) => ({
-            FM600: 0,
-            index: images.length + index + 1,
-            IMG: URL.createObjectURL(file), // dùng base64 làm preview tạm
-            RATIO: 1,
-            THUMB: URL.createObjectURL(file),
-            DES: "",
-            loading: true,
-            progress: 0,
-        }));
-        setImages((prev) => [...prev, ...tempImages]);
-
-
-        const startIndex = images.length;
-        const progressInterval = setInterval(() => {
-            setImages((prev) => prev.map((img, i) => {
-                if (i >= startIndex && img.loading && (img.progress || 0) < 90) {
-                    return { ...img, progress: (img.progress || 0) + 10 };
-                }
-                return img;
-            }));
-        }, 200);
-
-        try {
-            const result = await uploadImg(formData).unwrap();
-            clearInterval(progressInterval);
+    //     const tempImages: ContentImg[] = files.map((file, index) => ({
+    //         FM600: 0,
+    //         index: images.length + index + 1,
+    //         IMG: URL.createObjectURL(file), // dùng base64 làm preview tạm
+    //         RATIO: 1,
+    //         THUMB: URL.createObjectURL(file),
+    //         DES: "",
+    //         loading: true,
+    //         progress: 0,
+    //     }));
+    //     setImages((prev) => [...prev, ...tempImages]);
 
 
-            setImages((prev) => {
-                const newImages = [...prev];
-                result.elements.forEach((img, i) => {
-                    newImages[startIndex + i] = { ...img, loading: false, progress: 100 };
-                });
-                return newImages;
-            });
-        } catch (error) {
-            clearInterval(progressInterval);
-            console.log(error);
-        }
-    };
+    //     const startIndex = images.length;
+    //     const progressInterval = setInterval(() => {
+    //         setImages((prev) => prev.map((img, i) => {
+    //             if (i >= startIndex && img.loading && (img.progress || 0) < 90) {
+    //                 return { ...img, progress: (img.progress || 0) + 10 };
+    //             }
+    //             return img;
+    //         }));
+    //     }, 200);
+
+    //     try {
+    //         const result = await uploadImg(formData).unwrap();
+    //         clearInterval(progressInterval);
+
+
+    //         setImages((prev) => {
+    //             const newImages = [...prev];
+    //             result.elements.forEach((img, i) => {
+    //                 newImages[startIndex + i] = { ...img, loading: false, progress: 100 };
+    //             });
+    //             return newImages;
+    //         });
+    //     } catch (error) {
+    //         clearInterval(progressInterval);
+    //         console.log(error);
+    //     }
+    // };
 
     const handleMediaChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -204,7 +204,7 @@ export const useCreatePiepController = () => {
         images,
         setImages,
         onCloseCreate,
-        handleImageChange,
+        // handleImageChange,
         removeImage,
         PV301,
         setPV301,

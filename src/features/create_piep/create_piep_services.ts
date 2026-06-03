@@ -29,13 +29,13 @@ export const creataPiepApi = createApi({
                 body
             })
         }),
-        uploadImg: builder.mutation<BaseResponseObject<ContentImg[]>, FormData>({
-            query: (formData) => ({
-                url: 'upload_media',
-                method: 'POST',
-                body: formData,
-            }),
-        }),
+        // uploadImg: builder.mutation<BaseResponseObject<ContentImg[]>, FormData>({
+        //     query: (formData) => ({
+        //         url: 'upload_media',
+        //         method: 'POST',
+        //         body: formData,
+        //     }),
+        // }),
         uploadImgVideo: builder.mutation<BaseResponseObject<ContentImg[]>, FormData>({
             query: (formData) => ({
                 url: 'upload_img_video',
@@ -48,6 +48,6 @@ export const creataPiepApi = createApi({
 
 export const {
     useCreatePiepMutation,
-    useUploadImgMutation,
+    // useUploadImgMutation,
     useUploadImgVideoMutation,
 } = creataPiepApi
