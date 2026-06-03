@@ -35,6 +35,7 @@ export const authOptions: NextAuthOptions = {
                         body: JSON.stringify({ email: credentials.email }), // ← dùng normalized
                     });
                     const profile = await profileRes.json();
+                    console.log('profile.elements', profile.elements);
 
                     return {
                         id: profile.elements?.id || credentials.email,

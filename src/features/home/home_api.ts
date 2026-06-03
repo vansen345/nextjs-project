@@ -10,11 +10,11 @@ export const homeApi = createApi({
     endpoints: (builder) => ({
         getHomeList: builder.query<
             BaseResponse<HomeItem[]>,
-            { limit: number; offset: number }
+            { limit: number; offset: number, FO100: number }
         >({
-            query: ({ limit, offset }) => ({
+            query: ({ limit, offset, FO100 }) => ({
                 url: "/home",
-                params: { limit, offset },
+                params: { limit, offset, FO100 },
             }),
             providesTags: ["Home"],
         }),

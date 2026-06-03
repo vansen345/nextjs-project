@@ -1,6 +1,8 @@
 "use client";
 
 import { setIsModalOpen, setSelectedItem } from "@/features/detail/detail_redux_slice";
+import { useAuth } from "@/lib/hook/useAuth";
+import { useSocket } from "@/lib/hook/useSocket";
 import NProgress from '@/lib/nprogress';
 import { getDecryptedTitle, HomeItem } from "@/model/home_type";
 import { RootState } from "@/store";
@@ -15,6 +17,8 @@ import { useLazyGetHomeListQuery } from "./home_api";
 const LIMIT = 10;
 
 export const useHomePageController = () => {
+    const { likePost } = useSocket();
+    const { FO100 } = useAuth();
     const [list, setList] = useState<HomeItem[]>([]);
     const [hasMore, setHasMore] = useState(true);
 
@@ -32,6 +36,7 @@ export const useHomePageController = () => {
 
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
+        console.log('FO100 từ useAuth', FO100);
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
 
         isLoadingRef.current = true;
@@ -39,7 +44,8 @@ export const useHomePageController = () => {
         // setIsLoading(true);
 
         try {
-            const { data } = await trigger({ limit: LIMIT, offset: newOffset });
+            const { data } = await trigger({ limit: LIMIT, offset: newOffset, FO100: FO100 || 0 });
+            console.log('FO100 khi fetchList', FO100);
             if (data) {
                 const newItems = data.elements ?? [];
                 const newHasMore = newItems.length === LIMIT;
@@ -59,25 +65,11 @@ export const useHomePageController = () => {
             NProgress.done();
             // setIsLoading(false);
         }
-    }, [trigger]);
-
-   
-
-    // useEffect(() => {
-    //     if (hasFetchedRef.current) return;
-    //     hasFetchedRef.current = true;
-
-    //     setList([]); 
-    //     setHasMore(true);
-    //     offsetRef.current = 0;
-    //     hasMoreRef.current = true;
-
-    //     fetchList(0, true);
-    // }, [fetchList]);
-
+    }, [trigger,FO100]);
 
     useEffect(() => {
         if (!hasFetchedRef.current || shouldRefresh) {
+            if (!FO100 && FO100 !== 0) return;
             hasFetchedRef.current = true;
             startTransition(() => {
                 setList([]);
@@ -88,7 +80,7 @@ export const useHomePageController = () => {
                 if (shouldRefresh) dispatch(setShouldRefreshHome(false));
             });
         }
-    }, [fetchList, shouldRefresh, dispatch]);
+    }, [fetchList, shouldRefresh, dispatch,FO100]);
 
 
     useEffect(() => {
@@ -116,10 +108,27 @@ export const useHomePageController = () => {
         window.history.pushState(null, "", `/${slug}`);
     };
 
+    const handleLike = (PP300: number, isLiked: boolean) => {
+        likePost(PP300, FO100 || 0, isLiked);
+        setList((prevList) =>
+            prevList.map((item) => {
+                if (item.PP300 === PP300) {
+                    return {
+                        ...item,
+                        ISLIKED: isLiked ? 0 : 1,
+                        TOTALLIKES: (item.TOTALLIKES || 0) + (isLiked ? -1 : 1),
+                    };
+                }
+                return item;
+            })
+        );
+    };
+
     return {
         list,
         // isLoading,
         handleItemClick,
+        handleLike,
         hasMore,
         bottomRef,
     };

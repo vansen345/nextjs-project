@@ -123,9 +123,9 @@ function DetailScreen() {
             <div
               key={index}
               style={{ aspectRatio: `1/${media.RATIO}` }}
-              className="mb-3 relative w-full overflow-hidden"
+              className="mb-3 overflow-hidden"
             >
-              <div className="media-player pb-[56.25%] bg-black">
+              <div className="media-player bg-black relative w-full h-full">
                 {media.SRC ? (
                   <video
                     src={media.SRC}

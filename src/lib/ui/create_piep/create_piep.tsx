@@ -18,7 +18,6 @@ function CreatePiepScreen() {
     setPV301,
     onCloseCreate,
     images,
-    handleImageChange,
     removeImage,
     onSubmitCreatePiep,
     handleOpenMedia,
@@ -90,18 +89,21 @@ function CreatePiepScreen() {
           <label className="text-[18px] font-medium mb-2.5">
             {t("upload_img_create")}
           </label>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {images.map((img, index) => (
-              <div
-                key={index}
-                className="relative"
-                style={{ aspectRatio: `1/${img.RATIO || 1}` }}
-              >
+
+          {images.map((img, index) => (
+            <div
+              key={index}
+              className="mb-3 w-full overflow-hidden"
+              // style={{ aspectRatio: `${img.RATIO || 1}` }}
+              style={{ aspectRatio: 16/9 }} 
+            >
+             
+              <div className="media-player bg-black relative w-full h-full">
                 {img.SRC ? (
                   <video
                     src={img.SRC}
                     controls
-                    className="w-full h-full object-cover"
+                    className="absolute top-0 left-0 w-full h-full"
                     style={{ opacity: img.loading ? 0.4 : 1 }}
                   />
                 ) : (
@@ -138,31 +140,32 @@ function CreatePiepScreen() {
                   </button>
                 )}
               </div>
-            ))}
-            <div
-              className="upload-file flex justify-center items-center w-full h-108.75 bg-[#f4f4f4] rounded-[10px] cursor-pointer"
-              onDragOver={(e) => e.preventDefault()}
-              onClick={handleOpenMedia}
-              onDrop={(e) => {
-                e.preventDefault();
-                const files = Array.from(e.dataTransfer.files);
-                if (files.length > 0) {
-                  const fakeEvent = {
-                    target: { files: e.dataTransfer.files },
-                  } as React.ChangeEvent<HTMLInputElement>;
-                  // handleImageChange(fakeEvent);
-                  handleMediaChange(fakeEvent);
-                }
-              }}
-            >
-              <div className="icon-upload bg-white flex flex-col justify-center items-center w-35 h-[140] rounded-[100px]">
-                <p>
-                  <i className="fpme-image-video text-[56px]" />
-                </p>
-                <p>{t("upload_img_create")}</p>
-              </div>
             </div>
-            {/* <input
+          ))}
+          <div
+            className="upload-file flex justify-center items-center w-full h-108.75 bg-[#f4f4f4] rounded-[10px] cursor-pointer"
+            onDragOver={(e) => e.preventDefault()}
+            onClick={handleOpenMedia}
+            onDrop={(e) => {
+              e.preventDefault();
+              const files = Array.from(e.dataTransfer.files);
+              if (files.length > 0) {
+                const fakeEvent = {
+                  target: { files: e.dataTransfer.files },
+                } as React.ChangeEvent<HTMLInputElement>;
+                // handleImageChange(fakeEvent);
+                handleMediaChange(fakeEvent);
+              }
+            }}
+          >
+            <div className="icon-upload bg-white flex flex-col justify-center items-center w-35 h-[140] rounded-[100px]">
+              <p>
+                <i className="fpme-image-video text-[56px]" />
+              </p>
+              <p>{t("upload_img_create")}</p>
+            </div>
+          </div>
+          {/* <input
               ref={inputRef}
               type="file"
               accept="image/*"
@@ -171,15 +174,14 @@ function CreatePiepScreen() {
               onChange={handleImageChange}
             /> */}
 
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              className="hidden"
-              onChange={handleMediaChange}
-            />
-          </div>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*,video/*"
+            multiple
+            className="hidden"
+            onChange={handleMediaChange}
+          />
         </div>
         <div className="footer pt-2.5 text-end cursor-pointer">
           <button

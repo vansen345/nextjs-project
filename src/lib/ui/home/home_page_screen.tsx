@@ -15,7 +15,8 @@ function HomePageScreen() {
   const isModalOpen = useSelector(
     (state: RootState) => state.detail.isModalOpen,
   );
-  const { list, handleItemClick, bottomRef } = useHomePageController();
+  const { list, handleItemClick, handleLike, bottomRef } =
+    useHomePageController();
 
   return (
     <section className="relative z-10 pb-7.5 w-full min-h-screen">
@@ -76,11 +77,32 @@ function HomePageScreen() {
                   {getTimeText(data?.PD308 || "")}
                 </div>
                 <div className="mt-3 flex gap-2.5 font-semibold text-[20px]">
-                  <button className="flex items-center mr-6">
-                    <span>
-                      <i className="fpme-heart-line" />
+                  <button
+                    className="flex items-center mr-6 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLike(data.PP300 || 0, data?.ISLIKED === 1);
+                    }}
+                  >
+                    {data?.ISLIKED ? (
+                      <Image
+                        src="https://piepme.com/_nuxt/liked.png"
+                        alt=""
+                        width={20}
+                        height={20}
+                        preview={false}
+                      />
+                    ) : (
+                      <span>
+                        {" "}
+                        <i className="fpme-heart-line" />
+                      </span>
+                    )}
+
+                    <span className="text-[12px] ml-1">
+                      {" "}
+                      {data?.TOTALLIKES || 0}
                     </span>
-                    <span className="text-[12px] ml-1">3</span>
                   </button>
                   <button className="flex items-center flex-1">
                     <span>
