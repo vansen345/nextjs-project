@@ -6,6 +6,7 @@ import { useSocket } from "@/lib/hook/useSocket";
 import NProgress from '@/lib/nprogress';
 import { getDecryptedTitle, HomeItem } from "@/model/home_type";
 import { RootState } from "@/store";
+import { useSession } from "next-auth/react";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import slugify from "slugify";
@@ -18,7 +19,9 @@ const LIMIT = 10;
 
 export const useHomePageController = () => {
     const { likePost } = useSocket();
-    const { FO100 } = useAuth();
+
+    const { status } = useSession();
+    const { FO100, isLoggedIn } = useAuth();
     const [list, setList] = useState<HomeItem[]>([]);
     const [hasMore, setHasMore] = useState(true);
 
@@ -33,6 +36,7 @@ export const useHomePageController = () => {
     const dispatch = useDispatch();
 
     const shouldRefresh = useSelector((state: RootState) => state.createPiep.shouldRefreshHome);
+    const likeUpate = useSelector((state: RootState) => state.detail.likeUpdate);
 
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
@@ -65,11 +69,31 @@ export const useHomePageController = () => {
             NProgress.done();
             // setIsLoading(false);
         }
-    }, [trigger,FO100]);
+    }, [trigger, FO100]);
 
     useEffect(() => {
+        if (likeUpate) { 
+            startTransition(() => {
+                setList((prevList) =>
+                    prevList.map((item) => {
+                        if (item.PP300 === likeUpate.PP300) {
+                            return {
+                                ...item,
+                                ISLIKED: likeUpate.ISLIKED,
+                                TOTALLIKES: likeUpate.TOTALLIKES,
+                            };
+                        }
+                        return item;
+                    })
+                );
+            })
+
+        }
+    }, [likeUpate]);
+
+    useEffect(() => {
+        if (status === 'loading') return;
         if (!hasFetchedRef.current || shouldRefresh) {
-            if (!FO100 && FO100 !== 0) return;
             hasFetchedRef.current = true;
             startTransition(() => {
                 setList([]);
@@ -80,7 +104,7 @@ export const useHomePageController = () => {
                 if (shouldRefresh) dispatch(setShouldRefreshHome(false));
             });
         }
-    }, [fetchList, shouldRefresh, dispatch,FO100]);
+    }, [status, FO100, shouldRefresh]);
 
 
     useEffect(() => {
@@ -126,7 +150,8 @@ export const useHomePageController = () => {
 
     return {
         list,
-        // isLoading,
+        isLoggedIn,
+        dispatch,
         handleItemClick,
         handleLike,
         hasMore,

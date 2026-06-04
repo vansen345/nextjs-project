@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/hook/useAuth";
 import { signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import { setShouldRefreshHome } from "../create_piep/create_piep_redux_slice";
 import { setIsModalCreatePiep, setIsModalOpenLogin, setIsModalOpenRegiser } from "./header_redux_slice";
 
 
@@ -34,8 +35,12 @@ export const useHeaderController = () => {
   const onOpenRegister = () => dispatch(setIsModalOpenRegiser(true));
   const onOpenLogin = () => dispatch(setIsModalOpenLogin(true));
   const onCloseRegister = () => dispatch(setIsModalOpenRegiser(false));
-  const onLogout = () => signOut({ redirect: false });
+  const onLogout = () => {
+    dispatch(setShouldRefreshHome(true));
+    signOut({ redirect: false });
+  };
   const onOpenCreatePiep = () => dispatch(setIsModalCreatePiep(true));
 
   return { handleClick, getColor2, onOpenRegister, onCloseRegister, onOpenLogin, onLogout, onOpenCreatePiep, NV126, isLoggedIn };
 };
+

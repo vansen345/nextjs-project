@@ -1,5 +1,6 @@
 "use client";
 
+import { setIsModalOpenLogin } from "@/features/header/header_redux_slice";
 import { useHomePageController } from "@/features/home/home_controller";
 import { useDocumentTitle } from "@/lib/hook/useDocumentTitle";
 import DetailScreen from "@/lib/ui/detail/detail_screen";
@@ -15,7 +16,7 @@ function HomePageScreen() {
   const isModalOpen = useSelector(
     (state: RootState) => state.detail.isModalOpen,
   );
-  const { list, handleItemClick, handleLike, bottomRef } =
+  const { list, handleItemClick, handleLike, dispatch, bottomRef, isLoggedIn } =
     useHomePageController();
 
   return (
@@ -81,6 +82,10 @@ function HomePageScreen() {
                     className="flex items-center mr-6 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!isLoggedIn) {
+                        dispatch(setIsModalOpenLogin(true));
+                        return;
+                      }
                       handleLike(data.PP300 || 0, data?.ISLIKED === 1);
                     }}
                   >

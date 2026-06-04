@@ -5,6 +5,7 @@ import { message } from "antd";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { setShouldRefreshHome } from "../create_piep/create_piep_redux_slice";
 import { setIsModalOpenLogin } from "../header/header_redux_slice";
 import { useLoginUserMutation } from "./login_services";
 
@@ -56,6 +57,7 @@ export const useLoginController = () => {
         });
         if (result?.ok) {
             onCloseLogin();
+             dispatch(setShouldRefreshHome(true));
         } else {
             messageApi.error("Đăng nhập thất bại")
         }

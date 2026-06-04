@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: false,  // images: {
+  reactStrictMode: false,
+  allowedDevOrigins: ['192.168.1.18'],
+  // images: {
   //   remotePatterns: [
   //     {
   //       protocol: "https",
@@ -14,5 +16,6 @@ const nextConfig: NextConfig = {
   //   ],
   // },
 };
+
 
 export default nextConfig;

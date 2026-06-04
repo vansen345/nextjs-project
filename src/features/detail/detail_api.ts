@@ -8,11 +8,11 @@ export const detailApi = createApi({
     baseQuery,
     tagTypes:["Detail"],
     endpoints:(builder)=>({
-        detailPieper: builder.mutation<BaseResponseObject<HomeItem>,{PV325:string, PP300:number,FT300:number}>({
-            query:({PV325,PP300,FT300})=>({
+        detailPieper: builder.mutation<BaseResponseObject<HomeItem>,{PV325:string, PP300:number,FT300:number,FO100:number}>({
+            query:({PV325,PP300,FT300,FO100})=>({
                 url:"/detail",
                 method:"POST",
-                body:{PV325,PP300,FT300}
+                body:{PV325,PP300,FT300,FO100}
             })
         })
     })

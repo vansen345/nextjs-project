@@ -1,5 +1,6 @@
 import { useCommentController } from "@/features/comment/comment_controller";
 import { useDetailPageController } from "@/features/detail/detail_controller";
+import { setIsModalOpenLogin } from "@/features/header/header_redux_slice";
 import { useAuth } from "@/lib/hook/useAuth";
 import "@/lib/ui/detail/detail.css";
 import { getTimeText } from "@/lib/util";
@@ -9,8 +10,15 @@ import InputComment from "../comment/input_comment";
 import ListComment from "../comment/list_comment";
 
 function DetailScreen() {
-  const { detail, handleCancel, isModalOpen, dropdownOpen, setDropdownOpen } =
-    useDetailPageController();
+  const {
+    detail,
+    handleCancel,
+    handleLike,
+    isModalOpen,
+    dropdownOpen,
+    dispatch,
+    setDropdownOpen,
+  } = useDetailPageController();
   const { isLoggedIn } = useAuth();
 
   const {
@@ -159,6 +167,53 @@ function DetailScreen() {
             {listComment.length > 0 && (
               <ListComment listComment={listComment} />
             )}
+          </div>
+        </div>
+        <div className="action-pieper grid gap-5 absolute top-0 -right-17.25">
+          <div className="close flex flex-col items-center">
+            <button
+              onClick={handleCancel}
+              className="w-10 h-10 bg-[#4a4a4a] text-white rounded-full text-[10px]"
+            >
+              <i className="fpme-close"></i>
+            </button>
+          </div>
+
+          <div className="like flex flex-col items-center">
+            <button
+              className="w-12 h-12 bg-white rounded-[15px] text-[20px] mb-2.5"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!isLoggedIn) {
+                  dispatch(setIsModalOpenLogin(true));
+                  return;
+                }
+                handleLike();
+              }}
+            >
+              {detail?.ISLIKED ? (
+                <Image
+                  src="https://piepme.com/_nuxt/liked.png"
+                  alt=""
+                  width={20}
+                  height={20}
+                  preview={false}
+                />
+              ) : (
+                <span>
+                  <i className="fpme-heart-line" />
+                </span>
+              )}
+            </button>
+            <span className="text-white">{detail?.TOTALLIKES || 0}</span>
+          </div>
+          <div className="share flex flex-col items-center">
+            <button className="w-12 h-12 bg-white rounded-[15px] text-[20px] mb-2.5">
+              <span>
+                <i className="fpme-share"></i>
+              </span>
+            </button>
+            <span className="text-white">Chia sẻ</span>
           </div>
         </div>
 
