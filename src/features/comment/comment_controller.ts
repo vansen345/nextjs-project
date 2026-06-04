@@ -65,15 +65,26 @@ export const useCommentController = () => {
         const q = query(
             collection(firebase, 'comments'),
             where('PP300', '==', selectedItem.PP300),
-            where('createdAt', '>', new Date()),
             orderBy('createdAt', 'asc')
         );
 
+        // const unsubscribe = onSnapshot(q, (snapshot) => {
+        //     snapshot.docChanges().forEach((change) => {
+        //         if (change.type === 'added') {
+        //             const data = change.doc.data() as IComment;
+        //             setListComment((prev) => [...prev, { ...data, _id: change.doc.id }]);
+        //         }
+        //     });
+        // });
         const unsubscribe = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === 'added') {
                     const data = change.doc.data() as IComment;
-                    setListComment((prev) => [...prev, { ...data, _id: change.doc.id }]);
+                    setListComment((prev) => {
+                        const exists = prev.some(item => item._id === change.doc.id);
+                        if (exists) return prev;
+                        return [...prev, { ...data, _id: change.doc.id }];
+                    });
                 }
             });
         });

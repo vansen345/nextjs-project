@@ -1,4 +1,5 @@
 export interface IComment {
+    _id?: string;
     PP300?: number;
     comment?: string;
     FO100?: number;

@@ -11,7 +11,7 @@ export const InputComment = ({ inputComment, setInputComment, handleInsertCommen
                 placeholder="Nhập comment"
                 value={inputComment}
                 onChange={(e) => setInputComment(e.target.value)}
-                onKeyDown={(e) => {
+                onPressEnter={(e) => {
                     if (e.key === "Enter") {
                         e.preventDefault();
                         handleInsertComment();

@@ -173,7 +173,7 @@ function DetailScreen() {
           <div className="close flex flex-col items-center">
             <button
               onClick={handleCancel}
-              className="w-10 h-10 bg-[#4a4a4a] text-white rounded-full text-[10px]"
+              className="w-12 h-12 bg-[#4a4a4a] text-white rounded-full text-[10px] cursor-pointer"
             >
               <i className="fpme-close"></i>
             </button>
@@ -181,7 +181,7 @@ function DetailScreen() {
 
           <div className="like flex flex-col items-center">
             <button
-              className="w-12 h-12 bg-white rounded-[15px] text-[20px] mb-2.5"
+              className="w-12 h-12 bg-white rounded-[15px] text-[20px] mb-2.5 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 if (!isLoggedIn) {
@@ -208,7 +208,7 @@ function DetailScreen() {
             <span className="text-white">{detail?.TOTALLIKES || 0}</span>
           </div>
           <div className="share flex flex-col items-center">
-            <button className="w-12 h-12 bg-white rounded-[15px] text-[20px] mb-2.5">
+            <button className="w-12 h-12 bg-white rounded-[15px] text-[20px] mb-2.5 cursor-pointer">
               <span>
                 <i className="fpme-share"></i>
               </span>
