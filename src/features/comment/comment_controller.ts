@@ -83,7 +83,7 @@ export const useCommentController = () => {
                     setListComment((prev) => {
                         const exists = prev.some(item => item._id === change.doc.id);
                         if (exists) return prev;
-                        return [...prev, { ...data, _id: change.doc.id }];
+                        return [...prev, { ...data, _id: change.doc.id } as IComment];
                     });
                 }
             });
