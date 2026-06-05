@@ -77,6 +77,7 @@ export const useCommentController = () => {
         //     });
         // });
         const unsubscribe = onSnapshot(q, (snapshot) => {
+            console.log('snapshot triggered', snapshot.docChanges().length);
             snapshot.docChanges().forEach((change) => {
                 if (change.type === 'added') {
                     const data = change.doc.data() as IComment;
