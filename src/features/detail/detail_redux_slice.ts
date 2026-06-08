@@ -5,12 +5,14 @@ interface DetailState {
     selectedItem: HomeItem | null;
     isModalOpen: boolean;
     likeUpdate:{PP300:number,ISLIKED:number,TOTALLIKES:number} | null;
+    commentUpdate:{PP300:number,TOTALCOMMENTS:number} | null;
 }
 
 const initialState: DetailState = {
     selectedItem: null,
     isModalOpen: false,
     likeUpdate: null,
+    commentUpdate: null,
 };
 
 const detailSlice = createSlice({
@@ -25,10 +27,13 @@ const detailSlice = createSlice({
         },
         setLikeUpdate: (state, action: PayloadAction<{PP300:number,ISLIKED:number,TOTALLIKES:number} | null>) => {
             state.likeUpdate = action.payload;
+        },
+        setCommentUpdate: (state, action: PayloadAction<{PP300:number,TOTALCOMMENTS:number} | null>) => {
+            state.commentUpdate = action.payload;
         }
     },
     
 });
 
-export const { setSelectedItem, setIsModalOpen, setLikeUpdate    } = detailSlice.actions;
+export const { setSelectedItem, setIsModalOpen, setLikeUpdate, setCommentUpdate } = detailSlice.actions;
 export default detailSlice.reducer;

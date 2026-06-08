@@ -18,6 +18,7 @@ export const homeApi = createApi({
             }),
             providesTags: ["Home"],
         }),
+       
     }),
 });
 

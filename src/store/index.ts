@@ -8,6 +8,7 @@ import headerReducer from "@/features/header/header_redux_slice";
 import { homeApi } from "@/features/home/home_api";
 import authReducer from "@/features/login/authen_slice";
 import { loginApi } from "@/features/login/login_services";
+import { profileApi } from "@/features/profile/profile_services";
 import { registerApi } from "@/features/register/register_services";
 import { configureStore } from "@reduxjs/toolkit";
 
@@ -20,6 +21,7 @@ export const store = configureStore({
     [chatApi.reducerPath]: chatApi.reducer,
     [creataPiepApi.reducerPath]:creataPiepApi.reducer,
     [commentApi.reducerPath]:commentApi.reducer,
+    [profileApi.reducerPath]:profileApi.reducer,
     detail: detailReducer,
     header: headerReducer,
     auth: authReducer,
@@ -33,7 +35,8 @@ export const store = configureStore({
       .concat(loginApi.middleware)
       .concat(chatApi.middleware)
       .concat(creataPiepApi.middleware)
-      .concat(commentApi.middleware),
+      .concat(commentApi.middleware)
+      .concat(profileApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

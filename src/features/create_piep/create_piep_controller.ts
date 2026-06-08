@@ -24,6 +24,8 @@ export const useCreatePiepController = () => {
 
     const onCloseCreate = () => {
         if (images.some(img => img.loading)) return;
+        setPV301("");
+        setPV305("");
         setImages([]);
         dispatch(setIsModalCreatePiep(false))
     }

@@ -125,11 +125,13 @@ function HomePageScreen() {
                 </div>
                 <Divider style={{ margin: "12px 0" }} />
                 <div className="flex items-center">
-                  <Avatar
-                    size="large"
-                    style={{ cursor: "pointer" }}
-                    src={data.NV126 || null}
-                  />
+                  <div className="avt border-2 border-white rounded-[89px]">
+                    <Avatar
+                      size="large"
+                      style={{ cursor: "pointer" }}
+                      src={data.NV126 || null}
+                    />
+                  </div>
                   <div className="text-[14px] text-[#686868] font-bold">
                     {data.NV106 || ""}
                   </div>

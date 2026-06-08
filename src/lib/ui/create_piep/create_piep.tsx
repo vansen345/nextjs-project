@@ -52,7 +52,7 @@ function CreatePiepScreen() {
         </span>
       </div>
       <div className="create-piep">
-        <div className="create-piep-title">
+        <div className="create-piep-title mb-10">
           <label className="text-[18px] font-medium mb-2.5">
             {t("title_create")}
           </label>
@@ -61,9 +61,9 @@ function CreatePiepScreen() {
             onChange={(e) => setPV301(e.target.value)}
             classNames={{
               root: "text-[27px] !border-none !shadow-none !pl-0",
-              textarea: "font-bold !text-[27px] !h-auto !min-h-0",
+              textarea: "font-bold !text-[27px]",
             }}
-            autoSize={{ minRows: 4 }}
+            autoSize
             style={{ resize: "none" }}
             placeholder="Nhập tiêu đề..."
           />
@@ -77,8 +77,10 @@ function CreatePiepScreen() {
             onChange={(e) => setPV305(e.target.value)}
             classNames={{
               root: "!border-none !shadow-none !pl-0",
-              textarea:
-                "placeholder:text-[16px] !outline-none !shadow-none !h-auto !min-h-0",
+              textarea: "placeholder:text-[16px] !outline-none !shadow-none",
+              // root: "!border-none !shadow-none !pl-0",
+              // textarea:
+              //   "placeholder:text-[16px] !outline-none !shadow-none !h-auto !min-h-0",
             }}
             autoSize={{ minRows: 4 }}
             style={{ resize: "none" }}
@@ -95,9 +97,8 @@ function CreatePiepScreen() {
               key={index}
               className="mb-3 w-full overflow-hidden"
               // style={{ aspectRatio: `${img.RATIO || 1}` }}
-              style={{ aspectRatio: 16/9 }} 
+              style={{ aspectRatio: 16 / 9 }}
             >
-             
               <div className="media-player bg-black relative w-full h-full">
                 {img.SRC ? (
                   <video

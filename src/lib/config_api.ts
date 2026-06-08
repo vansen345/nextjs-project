@@ -7,7 +7,7 @@ export const API_CONFIG = {
     SENDMAIL: "/email/send",
     SENTOTP: "/email/sendOtp",
     VERIFYTOTP: "/email/verifyOtp",
-    REGISTER: "/register/registerUser", 
+    REGISTER: "/register/registerUser",
     LOGIN: "/login/loginUser",
     GETINFOLOGIN: "/login/getInfoUserLogin",
     SAVE_MESSAGE: "/message/save",
@@ -19,5 +19,8 @@ export const API_CONFIG = {
     INSERTCOMMENT: "/comment/insertComment",
     GETLISTCOMMENT: "/comment/listComment",
     UPLOAD_MEDIA: "/media/uploadMedia",
+    GETPROFILE: "/profile/getInforUser",
+    GETLISTPOST: "/profile/listPostByUser",
+    DELETEPOST: "/home/deletePost"
   },
 };

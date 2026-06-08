@@ -37,6 +37,7 @@ export const useHomePageController = () => {
 
     const shouldRefresh = useSelector((state: RootState) => state.createPiep.shouldRefreshHome);
     const likeUpate = useSelector((state: RootState) => state.detail.likeUpdate);
+    const commentUpdate = useSelector((state: RootState) => state.detail.commentUpdate);
 
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
@@ -45,8 +46,7 @@ export const useHomePageController = () => {
 
         isLoadingRef.current = true;
         NProgress.start();
-        // setIsLoading(true);
-
+       
         try {
             const { data } = await trigger({ limit: LIMIT, offset: newOffset, FO100: FO100 || 0 });
             console.log('FO100 khi fetchList', FO100);
@@ -72,7 +72,7 @@ export const useHomePageController = () => {
     }, [trigger, FO100]);
 
     useEffect(() => {
-        if (likeUpate) { 
+        if (likeUpate) {
             startTransition(() => {
                 setList((prevList) =>
                     prevList.map((item) => {
@@ -90,6 +90,24 @@ export const useHomePageController = () => {
 
         }
     }, [likeUpate]);
+
+    useEffect(()=>{
+        if(commentUpdate){
+            startTransition(() => {
+                setList((prevList)=>
+                    prevList.map((item)=>{
+                        if(item.PP300 === commentUpdate.PP300){
+                            return {
+                                ...item,
+                                TOTALCOMMENTS: commentUpdate.TOTALCOMMENTS,
+                            }
+                        }
+                        return item;
+                    })
+                );
+            })
+        }
+    })
 
     useEffect(() => {
         if (status === 'loading') return;

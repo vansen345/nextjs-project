@@ -4,9 +4,11 @@ import { useAuth } from "@/lib/hook/useAuth"
 import { useSocket } from "@/lib/hook/useSocket"
 import { HomeItem } from "@/model/home_type"
 import { RootState } from "@/store"
-import { useEffect, useRef, useState } from "react"
+import { message } from "antd"
+import { startTransition, useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useDetailPieperMutation } from "./detail_api"
+import { setShouldRefreshHome } from "../create_piep/create_piep_redux_slice"
+import { useDeletePostMutation, useDetailPieperMutation } from "./detail_api"
 import { setIsModalOpen, setLikeUpdate, setSelectedItem } from "./detail_redux_slice"
 
 export const useDetailPageController = () => {
@@ -17,14 +19,19 @@ export const useDetailPageController = () => {
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const {  isLoggedIn,FO100 } = useAuth();
+    const { isLoggedIn, FO100 } = useAuth();
     const isModalOpen = useSelector(
         (state: RootState) => state.detail.isModalOpen,
     );
     const hasFetchedRef = useRef<number | null>(null);
+    const commentUpdate = useSelector((state: RootState) => state.detail.commentUpdate);
+    const [detletePostUset] = useDeletePostMutation();
+    const [messageApi, contextHolder] = message.useMessage();
+
 
     useEffect(() => {
         console.log(`selectedItem?.PP300--${selectedItem?.PP300}`);
+        console.log(typeof detletePostUset);
 
         if (!selectedItem?.PP300) return;
         if (hasFetchedRef.current === selectedItem.PP300) return;
@@ -48,11 +55,21 @@ export const useDetailPageController = () => {
         fetch();
     }, [selectedItem?.PP300]);
 
+    useEffect(() => {
+        if (commentUpdate) {
+            startTransition(() => {
+                setDetail(prevDetail => prevDetail ? { ...prevDetail, TOTALCOMMENTS: commentUpdate.TOTALCOMMENTS } : prevDetail);
+            });
+            console.log(detail?.TOTALCOMMENTS, commentUpdate.TOTALCOMMENTS);
+        }
+    }, [commentUpdate]);
+
     const handleCancel = () => {
         if (dropdownOpen) {
             setDropdownOpen(false);
             return;
         }
+
         dispatch(setIsModalOpen(false));
         dispatch(setSelectedItem(null));
         window.history.pushState(null, "", "/");
@@ -63,20 +80,35 @@ export const useDetailPageController = () => {
         setDetail((prevDetail) => prevDetail
             ? { ...prevDetail, ISLIKED: prevDetail.ISLIKED ? 0 : 1, TOTALLIKES: (prevDetail.TOTALLIKES || 0) + (prevDetail.ISLIKED ? -1 : 1) }
             : prevDetail);
-        dispatch(setLikeUpdate({PP300: detail?.PP300 || 0, ISLIKED: detail?.ISLIKED === 1 ? 0 : 1, TOTALLIKES: (detail?.TOTALLIKES || 0) + (detail?.ISLIKED === 1 ? -1 : 1)}));
-        // prevList.map((item) => {
-        //     if (item.PP300 === PP300) {
-        //         return {
-        //             ...item,
-        //             ISLIKED: isLiked ? 0 : 1,
-        //             TOTALLIKES: (item.TOTALLIKES || 0) + (isLiked ? -1 : 1),
-        //         };
-        //     }
-        //     return item;
-        // })
+        dispatch(setLikeUpdate({ PP300: detail?.PP300 || 0, ISLIKED: detail?.ISLIKED === 1 ? 0 : 1, TOTALLIKES: (detail?.TOTALLIKES || 0) + (detail?.ISLIKED === 1 ? -1 : 1) }));
 
     };
 
-    return { detail, isLoading, isModalOpen, isLoggedIn,dropdownOpen,dispatch, setDropdownOpen, handleCancel,handleLike };
+    const onDeletePostUser = async () => {
+        try {
+            const rs = await detletePostUset({
+                PP300: selectedItem?.PP300 || 0,
+                FT300: selectedItem?.FT300 || 0,
+                FO100: selectedItem?.FO100 || 0,
+            }).unwrap();
+            if (rs.elements !== null) {
+                // messageApi.success("Xoá thành công");
+                // dispatch(setSelectedItem(null));
+                // dispatch(setIsModalOpen(false));
+                // dispatch(setShouldRefreshHome(true));
+                 dispatch(setIsModalOpen(false));
+                dispatch(setSelectedItem(null));
+                dispatch(setShouldRefreshHome(true));
+               
+
+            } else {
+                messageApi.error("Xoá không thành công")
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    return { detail, isLoading, isModalOpen, isLoggedIn, dropdownOpen, dispatch, setDropdownOpen, handleCancel, handleLike, onDeletePostUser };
 
 }

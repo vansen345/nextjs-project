@@ -18,14 +18,16 @@ function DetailScreen() {
     dropdownOpen,
     dispatch,
     setDropdownOpen,
+    onDeletePostUser,
   } = useDetailPageController();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, FO100 } = useAuth();
 
   const {
     listComment,
     inputComment,
     setInputComment,
     handleInsertComment,
+    
     isLoading,
     hasMore,
   } = useCommentController();
@@ -41,32 +43,22 @@ function DetailScreen() {
     })),
   ].sort((a, b) => a.index - b.index);
 
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.antgroup.com"
-        >
-          Chỉnh sửa
-        </a>
-      ),
-    },
-    {
-      key: "2",
-      label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.aliyun.com"
-        >
-          Xoá
-        </a>
-      ),
-    },
-  ];
+  const items: MenuProps["items"] =
+    detail?.FO100 === FO100
+      ? [
+          {
+            key: "1",
+            label: <span>Chỉnh sửa</span>,
+          },
+          {
+            key: "2",
+            label: <span onClick={onDeletePostUser}>Xoá</span>,
+          },
+        ]
+      : [  {
+            key: "1",
+            label: <span>Báo cáo</span>,
+          },];
   return (
     <div>
       <Modal

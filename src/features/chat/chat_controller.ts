@@ -137,7 +137,7 @@ export const useChatController = () => {
 
 
                 setListConversation(prev =>
-                    isInitial ? newItems : [...prev, ...newItems] // ← reset nếu isInitial
+                    isInitial ? newItems : [...prev, ...newItems] 
                 )
 
 

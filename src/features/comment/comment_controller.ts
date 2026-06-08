@@ -5,7 +5,8 @@ import { RootState } from "@/store";
 import { message } from 'antd';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setCommentUpdate } from '../detail/detail_redux_slice';
 import { useInsertCommentMutation, useLazyGetListCommentQuery } from "./comment_services";
 
 export const useCommentController = () => {
@@ -13,6 +14,7 @@ export const useCommentController = () => {
 
     const [listComment, setListComment] = useState<IComment[]>([]);
     const { FO100, NV126, NV106 } = useAuth();
+    const dispatch = useDispatch();
 
     const bottomRef = useRef<HTMLDivElement>(null);
     const [inputComment, setInputComment] = useState("");
@@ -30,7 +32,7 @@ export const useCommentController = () => {
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
-        isLoadingRef.current = true;
+        isLoadingRef.current = true; 
 
         try {
             const { data } = await trigger({ PP300: selectedItem?.PP300 || 0, limit: LIMIT, offset: newOffset })
@@ -59,6 +61,32 @@ export const useCommentController = () => {
         fetchList(0, true);
     }, [selectedItem?.PP300, fetchList]);
 
+    // useEffect(() => {
+    //     if (!selectedItem?.PP300) return;
+
+    //     const q = query(
+    //         collection(firebase, 'comments'),
+    //         where('PP300', '==', selectedItem.PP300),
+    //         orderBy('createdAt', 'asc')
+    //     );
+
+    //     const unsubscribe = onSnapshot(q, (snapshot) => {
+    //         console.log('snapshot triggered', snapshot.docChanges().length);
+    //         snapshot.docChanges().forEach((change) => {
+    //             if (change.type === 'added') {
+    //                 const data = change.doc.data() as IComment;
+    //                 setListComment((prev) => {
+    //                     const exists = prev.some(item => item._id === change.doc.id);
+    //                     if (exists) return prev;
+    //                     return [...prev, { ...data, _id: change.doc.id } as IComment];
+    //                 });
+    //             }
+    //         });
+    //     });
+
+    //     return () => unsubscribe();
+    // }, [selectedItem?.PP300]);
+
     useEffect(() => {
         if (!selectedItem?.PP300) return;
 
@@ -68,25 +96,30 @@ export const useCommentController = () => {
             orderBy('createdAt', 'asc')
         );
 
-        // const unsubscribe = onSnapshot(q, (snapshot) => {
-        //     snapshot.docChanges().forEach((change) => {
-        //         if (change.type === 'added') {
-        //             const data = change.doc.data() as IComment;
-        //             setListComment((prev) => [...prev, { ...data, _id: change.doc.id }]);
-        //         }
-        //     });
-        // });
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            console.log('snapshot triggered', snapshot.docChanges().length);
             snapshot.docChanges().forEach((change) => {
-                if (change.type === 'added') {
-                    const data = change.doc.data() as IComment;
-                    setListComment((prev) => {
-                        const exists = prev.some(item => item._id === change.doc.id);
-                        if (exists) return prev;
-                        return [...prev, { ...data, _id: change.doc.id } as IComment];
-                    });
-                }
+                if (change.type !== 'added') return;
+
+                const data = change.doc.data() as IComment;
+
+                const comment = {
+                    ...data,
+                    _id: change.doc.id,
+                } as IComment;
+
+                setListComment((prev) => {
+                    const exists = prev.some(
+                        (item) => item._id === change.doc.id
+                    );
+
+                    if (exists) return prev;
+                    dispatch(setCommentUpdate({
+                        PP300: selectedItem.PP300 || 0,
+                        TOTALCOMMENTS: prev.length + 1
+                    }));
+
+                    return [...prev, comment];
+                });
             });
         });
 
@@ -104,6 +137,7 @@ export const useCommentController = () => {
                 NV126: NV126 || "",
             }).unwrap();
             setInputComment("");
+            dispatch(setCommentUpdate({ PP300: selectedItem?.PP300 || 0, TOTALCOMMENTS: (listComment.length || 0) + 1 }));
         } catch (error) {
             console.log(error);
         }

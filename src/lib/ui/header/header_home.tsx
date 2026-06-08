@@ -143,7 +143,7 @@ function Header() {
                     {
                       key: "1",
                       label: isLoggedIn ? t("text_profile") : t("register"),
-                      onClick: isLoggedIn ? () => {} : onOpenRegister,
+                      onClick: isLoggedIn ? () => router.push(`/profile/${FO100}`) : onOpenRegister,
                     },
                     {
                       key: "2",
