@@ -1,9 +1,10 @@
 "use client";
 
 import { useAuth } from "@/lib/hook/useAuth";
+import { RootState } from "@/store";
 import { signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setShouldRefreshHome } from "../create_piep/create_piep_redux_slice";
 import { setIsModalCreatePiep, setIsModalOpenLogin, setIsModalOpenRegiser } from "./header_redux_slice";
 
@@ -13,6 +14,9 @@ export const useHeaderController = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { isLoggedIn, NV126 } = useAuth();
+  const isModelCreatePiep = useSelector((state:RootState)=>state.header.isModelCreatePiep);
+  const isModalLogin = useSelector((state:RootState)=>state.header.isModalLogin);
+  const isModalRegister = useSelector((state:RootState)=>state.header.isModalRegister);
 
   // const avatar = session?.user?.NV126;
   // const isLoggedIn = !!session;
@@ -41,6 +45,6 @@ export const useHeaderController = () => {
   };
   const onOpenCreatePiep = () => dispatch(setIsModalCreatePiep(true));
 
-  return { handleClick, getColor2, onOpenRegister, onCloseRegister, onOpenLogin, onLogout, onOpenCreatePiep, NV126, isLoggedIn };
+  return { handleClick, getColor2, onOpenRegister, onCloseRegister, onOpenLogin, onLogout, onOpenCreatePiep,isModelCreatePiep,isModalLogin,isModalRegister, NV126, isLoggedIn };
 };
 

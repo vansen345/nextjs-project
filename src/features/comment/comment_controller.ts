@@ -32,7 +32,7 @@ export const useCommentController = () => {
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
-        isLoadingRef.current = true; 
+        isLoadingRef.current = true;
 
         try {
             const { data } = await trigger({ PP300: selectedItem?.PP300 || 0, limit: LIMIT, offset: newOffset })
@@ -99,24 +99,20 @@ export const useCommentController = () => {
         const unsubscribe = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type !== 'added') return;
-
                 const data = change.doc.data() as IComment;
-
-                const comment = {
-                    ...data,
-                    _id: change.doc.id,
-                } as IComment;
+                const comment = { ...data, _id: change.doc.id } as IComment;
 
                 setListComment((prev) => {
-                    const exists = prev.some(
-                        (item) => item._id === change.doc.id
-                    );
-
+                    const exists = prev.some((item) => item._id === change.doc.id);
                     if (exists) return prev;
-                    dispatch(setCommentUpdate({
-                        PP300: selectedItem.PP300 || 0,
-                        TOTALCOMMENTS: prev.length + 1
-                    }));
+
+                    // ✅ Dùng setTimeout để tách khỏi render cycle
+                    setTimeout(() => {
+                        dispatch(setCommentUpdate({
+                            PP300: selectedItem.PP300 || 0,
+                            TOTALCOMMENTS: prev.length + 1
+                        }));
+                    }, 0);
 
                     return [...prev, comment];
                 });

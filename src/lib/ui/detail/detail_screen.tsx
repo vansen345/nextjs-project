@@ -1,15 +1,22 @@
 import { useCommentController } from "@/features/comment/comment_controller";
 import { useDetailPageController } from "@/features/detail/detail_controller";
-import { setIsModalOpenLogin } from "@/features/header/header_redux_slice";
+import { setEditPostData, setIsEditMode } from "@/features/detail/detail_redux_slice";
+import {
+  setIsModalCreatePiep,
+  setIsModalOpenLogin,
+} from "@/features/header/header_redux_slice";
+import i18n from "@/i18n";
 import { useAuth } from "@/lib/hook/useAuth";
 import "@/lib/ui/detail/detail.css";
 import { getTimeText } from "@/lib/util";
 import { getDecryptedContent, getDecryptedTitle } from "@/model/home_type";
 import { Avatar, Dropdown, Image, MenuProps, Modal } from "antd";
+import { useTranslation } from "react-i18next";
 import InputComment from "../comment/input_comment";
 import ListComment from "../comment/list_comment";
 
 function DetailScreen() {
+  const { t } = useTranslation(undefined, { i18n });
   const {
     detail,
     handleCancel,
@@ -27,7 +34,7 @@ function DetailScreen() {
     inputComment,
     setInputComment,
     handleInsertComment,
-    
+
     isLoading,
     hasMore,
   } = useCommentController();
@@ -48,17 +55,29 @@ function DetailScreen() {
       ? [
           {
             key: "1",
-            label: <span>Chỉnh sửa</span>,
+            label: (
+              <span
+                onClick={() => {
+                  dispatch(setIsModalCreatePiep(true));
+                  dispatch(setIsEditMode(true));
+                  dispatch(setEditPostData(detail)); // truyền data post hiện tại
+                }}
+              >
+                Chỉnh sửa
+              </span>
+            ),
           },
           {
             key: "2",
             label: <span onClick={onDeletePostUser}>Xoá</span>,
           },
         ]
-      : [  {
+      : [
+          {
             key: "1",
             label: <span>Báo cáo</span>,
-          },];
+          },
+        ];
   return (
     <div>
       <Modal
@@ -114,9 +133,9 @@ function DetailScreen() {
         </div>
         <div className="detail-body">
           <div className="detail-title">
-            <h1 className="text-title">{getDecryptedTitle(detail?.PV301)}</h1>
+            <h1 className="text-title whitespace-pre-wrap">{getDecryptedTitle(detail?.PV301)}</h1>
           </div>
-          <div className="text-base font-normal text-black leading-[1.56] mb-5">
+          <div className="text-base font-normal text-black leading-[1.56] mb-5 whitespace-pre-wrap">
             {getDecryptedContent(detail?.PV305)}
           </div>
           {dataMedia?.map((media, index) => (

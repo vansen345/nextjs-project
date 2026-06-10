@@ -21,6 +21,7 @@ export const API_CONFIG = {
     UPLOAD_MEDIA: "/media/uploadMedia",
     GETPROFILE: "/profile/getInforUser",
     GETLISTPOST: "/profile/listPostByUser",
-    DELETEPOST: "/home/deletePost"
+    DELETEPOST: "/home/deletePost",
+    UPDATEPOST: "/home/updatePostUser"
   },
 };

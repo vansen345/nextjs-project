@@ -27,6 +27,10 @@ import "./header_style.css";
 type SizeType = ConfigProviderProps["componentSize"];
 
 function Header() {
+  const [pageTitle, setPageTitle] = useState("PiepMe");
+  useEffect(() => {
+    document.title = pageTitle;
+  }, [pageTitle]);
   const { t } = useTranslation(undefined, { i18n });
   const currentLang = i18n.language;
   const [size] = useState<SizeType>("large");
@@ -39,8 +43,11 @@ function Header() {
     onOpenCreatePiep,
     NV126,
     isLoggedIn,
+    isModelCreatePiep,
+    isModalLogin,
+    isModalRegister,
   } = useHeaderController();
-  
+
   const { FO100 } = useAuth();
   const router = useRouter();
   const [fetchHome] = useLazyGetHomeListQuery();
@@ -49,9 +56,10 @@ function Header() {
     document.body.classList.add("hydrated");
   }, []);
 
-  const handleLogoClick = () => {
+  const handleLogoClick = (title: string = "Cộng đồng") => {
+    setPageTitle(title);
     router.push("/");
-    fetchHome({ limit: 10, offset: 0,FO100: FO100 || 0 });
+    fetchHome({ limit: 10, offset: 0, FO100: FO100 || 0 });
   };
 
   return (
@@ -78,7 +86,7 @@ function Header() {
                 height={22}
                 preview={false}
                 className="cursor-pointer"
-                onClick={handleLogoClick}
+                onClick={() => handleLogoClick()}
               />
             </span>
             <div className="search-header">
@@ -90,19 +98,19 @@ function Header() {
           <div className="menu-text hidden md:flex gap-4 mr-8 shrink-0">
             <p
               className={`text-header ${getColor2("/")}`}
-              onClick={handleLogoClick}
+              onClick={() => handleLogoClick("Cộng đồng")}
             >
               Cộng đồng
             </p>
             <p
               className={`text-header ${getColor2("piepAudio")}`}
-              onClick={() => handleClick("/piepAudio")}
+              onClick={() => handleLogoClick("PiepAUDIO")}
             >
               PiepAUDIO
             </p>
             <p
               className={`text-header ${getColor2("vietnam")}`}
-              onClick={() => handleClick("/vietnam")}
+              onClick={() => handleLogoClick("Việt Nam Bây Giờ")}
             >
               Việt Nam Bây Giờ
             </p>
@@ -143,7 +151,9 @@ function Header() {
                     {
                       key: "1",
                       label: isLoggedIn ? t("text_profile") : t("register"),
-                      onClick: isLoggedIn ? () => router.push(`/profile/${FO100}`) : onOpenRegister,
+                      onClick: isLoggedIn
+                        ? () => router.push(`/profile/${FO100}`)
+                        : onOpenRegister,
                     },
                     {
                       key: "2",
@@ -178,9 +188,9 @@ function Header() {
           </div>
         </div>
       </Flex>
-      <RegisterScreen />
-      <LoginScreen />
-      <CreatePiepScreen />
+      {isModalRegister && <RegisterScreen />}
+      {isModalLogin && <LoginScreen />}
+      {isModelCreatePiep && <CreatePiepScreen />}
     </>
   );
 }

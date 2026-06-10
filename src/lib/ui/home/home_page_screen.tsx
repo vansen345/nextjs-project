@@ -2,7 +2,6 @@
 
 import { setIsModalOpenLogin } from "@/features/header/header_redux_slice";
 import { useHomePageController } from "@/features/home/home_controller";
-import { useDocumentTitle } from "@/lib/hook/useDocumentTitle";
 import DetailScreen from "@/lib/ui/detail/detail_screen";
 import { getTimeText } from "@/lib/util";
 import { getDecryptedTitle } from "@/model/home_type";
@@ -12,7 +11,6 @@ import { useSelector } from "react-redux";
 // import "./home_style.css";
 
 function HomePageScreen() {
-  useDocumentTitle("APP");
   const isModalOpen = useSelector(
     (state: RootState) => state.detail.isModalOpen,
   );

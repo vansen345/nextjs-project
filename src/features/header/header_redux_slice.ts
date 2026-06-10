@@ -7,6 +7,7 @@ interface HeaderState {
     isModalRegister: boolean;
     isModalLogin: boolean;
     isModelCreatePiep: boolean;
+   
 
 }
 
@@ -14,9 +15,10 @@ const initialState: HeaderState = {
     isScrolled: false,
     isSearchOpen: false,
     searchQuery: "",
-    isModalRegister:false,
+    isModalRegister: false,
     isModalLogin: false,
     isModelCreatePiep: false,
+    
 };
 
 const headerSlice = createSlice({
@@ -32,17 +34,18 @@ const headerSlice = createSlice({
         setSearchQuery: (state, action: PayloadAction<string>) => {
             state.searchQuery = action.payload;
         },
-        setIsModalOpenRegiser:( state,action:PayloadAction<boolean>)=>{
-            state.isModalRegister=action.payload;
+        setIsModalOpenRegiser: (state, action: PayloadAction<boolean>) => {
+            state.isModalRegister = action.payload;
         },
-        setIsModalOpenLogin:(state,action:PayloadAction<boolean>)=>{
+        setIsModalOpenLogin: (state, action: PayloadAction<boolean>) => {
             state.isModalLogin = action.payload;
         },
-        setIsModalCreatePiep:(state, action:PayloadAction<boolean>)=>{
+        setIsModalCreatePiep: (state, action: PayloadAction<boolean>) => {
             state.isModelCreatePiep = action.payload;
-        }
+        },
+     
     },
 });
 
-export const { setIsScrolled, setIsSearchOpen, setSearchQuery,setIsModalOpenRegiser,setIsModalOpenLogin,setIsModalCreatePiep } = headerSlice.actions;
+export const { setIsScrolled, setIsSearchOpen, setSearchQuery, setIsModalOpenRegiser, setIsModalOpenLogin, setIsModalCreatePiep,  } = headerSlice.actions;
 export default headerSlice.reducer;

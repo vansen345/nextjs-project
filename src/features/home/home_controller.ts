@@ -41,7 +41,7 @@ export const useHomePageController = () => {
 
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
-        console.log('FO100 từ useAuth', FO100);
+        
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
 
         isLoadingRef.current = true;
@@ -49,7 +49,7 @@ export const useHomePageController = () => {
        
         try {
             const { data } = await trigger({ limit: LIMIT, offset: newOffset, FO100: FO100 || 0 });
-            console.log('FO100 khi fetchList', FO100);
+           
             if (data) {
                 const newItems = data.elements ?? [];
                 const newHasMore = newItems.length === LIMIT;

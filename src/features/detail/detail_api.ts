@@ -21,11 +21,11 @@ export const detailApi = createApi({
                 method: "POST",
                 body: { PP300, FT300, FO100 }
             })
+        }),
 
-        })
     })
 });
 export const {
     useDetailPieperMutation,
-    useDeletePostMutation
+    useDeletePostMutation,
 } = detailApi;

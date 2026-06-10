@@ -2,11 +2,12 @@ import { useAuth } from "@/lib/hook/useAuth";
 import { ContentImg } from "@/model/upload_media";
 import { RootState } from "@/store";
 import imageCompression from 'browser-image-compression';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { setEditPostData, setIsEditMode, setRefreshDetail } from "../detail/detail_redux_slice";
 import { setIsModalCreatePiep } from "../header/header_redux_slice";
 import { setShouldRefreshHome } from "./create_piep_redux_slice";
-import { useCreatePiepMutation, useUploadImgVideoMutation } from "./create_piep_services";
+import { useCreatePiepMutation, useUpdatePostMutation, useUploadImgVideoMutation } from "./create_piep_services";
 
 
 export const useCreatePiepController = () => {
@@ -24,10 +25,12 @@ export const useCreatePiepController = () => {
 
     const onCloseCreate = () => {
         if (images.some(img => img.loading)) return;
-        setPV301("");
-        setPV305("");
+        dispatch(setIsModalCreatePiep(false));
+        dispatch(setIsEditMode(false));
+        dispatch(setEditPostData(null));
+        setPV301('');
+        setPV305('');
         setImages([]);
-        dispatch(setIsModalCreatePiep(false))
     }
 
     const [createPiep] = useCreatePiepMutation();
@@ -40,60 +43,14 @@ export const useCreatePiepController = () => {
         }, 200);
     };
 
-    // const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const files = Array.from(e.target.files || []);
-    //     const formData = new FormData();
+    const [upDatePost] = useUpdatePostMutation();
+    const editData = useSelector((state: RootState) => state.detail.editPostData);
+    const checkEdit = useSelector((state: RootState) => state.detail.isEditMode);
 
-    //     await Promise.all(
-    //         files.map(async (file) => {
-    //             const compressed = await imageCompression(file, {
-    //                 maxSizeMB: 1,
-    //                 maxWidthOrHeight: 1280,
-    //             });
-    //             formData.append('image', compressed, compressed.name);
-    //         })
-    //     );
+    useEffect(() => {
+        console.log('checkEdit', checkEdit);
 
-    //     const tempImages: ContentImg[] = files.map((file, index) => ({
-    //         FM600: 0,
-    //         index: images.length + index + 1,
-    //         IMG: URL.createObjectURL(file), // dùng base64 làm preview tạm
-    //         RATIO: 1,
-    //         THUMB: URL.createObjectURL(file),
-    //         DES: "",
-    //         loading: true,
-    //         progress: 0,
-    //     }));
-    //     setImages((prev) => [...prev, ...tempImages]);
-
-
-    //     const startIndex = images.length;
-    //     const progressInterval = setInterval(() => {
-    //         setImages((prev) => prev.map((img, i) => {
-    //             if (i >= startIndex && img.loading && (img.progress || 0) < 90) {
-    //                 return { ...img, progress: (img.progress || 0) + 10 };
-    //             }
-    //             return img;
-    //         }));
-    //     }, 200);
-
-    //     try {
-    //         const result = await uploadImg(formData).unwrap();
-    //         clearInterval(progressInterval);
-
-
-    //         setImages((prev) => {
-    //             const newImages = [...prev];
-    //             result.elements.forEach((img, i) => {
-    //                 newImages[startIndex + i] = { ...img, loading: false, progress: 100 };
-    //             });
-    //             return newImages;
-    //         });
-    //     } catch (error) {
-    //         clearInterval(progressInterval);
-    //         console.log(error);
-    //     }
-    // };
+    })
 
     const handleMediaChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -195,10 +152,74 @@ export const useCreatePiepController = () => {
         } catch (error) {
             console.log(error);
         }
-
     }
 
+    useEffect(() => {
+        if (checkEdit && editData) {
+            setTimeout(() => {
+                setPV301(editData.PV301 ?? '');
+                setPV305(editData.PV305 ?? '');
+                // nếu có ảnh/video thì fill luôn
+                if (editData.PO322) {
+                    const mediaImages = editData.PO322.image.map((img, i) => ({
+                        FM600: img.FM600,
+                        index: i,
+                        IMG: img.IMG ?? '',
+                        SRC: undefined,
+                        RATIO: img.RATIO,
+                        THUMB: img.THUMB ?? '',
+                        DES: img.DES ?? '',
+                        loading: false,
+                        progress: 100,
+                    }));
 
+                    const mediaVideos = editData.PO322.video.map((vid, i) => ({
+                        FM600: vid.FM600,
+                        index: mediaImages.length + i,
+                        IMG: undefined,
+                        SRC: vid.SRC ?? '',
+                        RATIO: vid.RATIO,
+                        THUMB: vid.THUMB ?? '',
+                        DES: vid.DES ?? '',
+                        loading: false,
+                        progress: 100,
+                    }));
+
+                    setImages([...mediaImages, ...mediaVideos]);
+                }
+            }, 0)
+
+        } else {
+            setTimeout(() => {
+                setPV301('');
+                setPV305('');
+                setImages([]);
+            }, 0);
+        }
+    }, [checkEdit, editData]);
+
+    const onEdit = async () => {
+        const mediaList = images.map(({ loading: _l, progress: _p, ...rest }) => rest);
+        const imageList = mediaList.filter(item => item.IMG);
+        const videoList = mediaList.filter(item => item.SRC);
+        const rs = await upDatePost({
+            PP300: editData?.PP300 || 0,
+            FT300: editData?.FT300 || 0,
+            FO100: editData?.FO100 || 0,
+            PV305: PV305 || "",
+            PV301: PV301 || "",
+            PO322: {
+                image: imageList,
+                video: videoList,
+            },
+        }).unwrap();
+        if (rs.elements > 0) {
+            dispatch(setIsModalCreatePiep(false));
+            dispatch(setIsEditMode(false));
+            dispatch(setEditPostData(null));
+            dispatch(setRefreshDetail()); 
+        }
+    };
 
     return {
         isLoading,
@@ -206,7 +227,8 @@ export const useCreatePiepController = () => {
         images,
         setImages,
         onCloseCreate,
-        // handleImageChange,
+        editData,
+        checkEdit,
         removeImage,
         PV301,
         setPV301,
@@ -216,6 +238,7 @@ export const useCreatePiepController = () => {
         handleOpenMedia,
         NV126, NV106,
         inputRef,
-        handleMediaChange
+        handleMediaChange,
+        onEdit,
     }
 } 

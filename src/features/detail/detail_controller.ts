@@ -26,14 +26,16 @@ export const useDetailPageController = () => {
     const hasFetchedRef = useRef<number | null>(null);
     const commentUpdate = useSelector((state: RootState) => state.detail.commentUpdate);
     const [detletePostUset] = useDeletePostMutation();
-    const [messageApi, contextHolder] = message.useMessage();
+    const [messageApi] = message.useMessage();
+    const refreshDetail = useSelector((state: RootState) => state.detail.refreshDetail);
+
 
 
     useEffect(() => {
-        console.log(`selectedItem?.PP300--${selectedItem?.PP300}`);
-        console.log(typeof detletePostUset);
-
         if (!selectedItem?.PP300) return;
+
+        hasFetchedRef.current = null;
+
         if (hasFetchedRef.current === selectedItem.PP300) return;
         hasFetchedRef.current = selectedItem.PP300;
 
@@ -53,7 +55,7 @@ export const useDetailPageController = () => {
         };
 
         fetch();
-    }, [selectedItem?.PP300]);
+    }, [selectedItem?.PP300, refreshDetail]);
 
     useEffect(() => {
         if (commentUpdate) {
@@ -92,14 +94,10 @@ export const useDetailPageController = () => {
                 FO100: selectedItem?.FO100 || 0,
             }).unwrap();
             if (rs.elements !== null) {
-                // messageApi.success("Xoá thành công");
-                // dispatch(setSelectedItem(null));
-                // dispatch(setIsModalOpen(false));
-                // dispatch(setShouldRefreshHome(true));
-                 dispatch(setIsModalOpen(false));
+                dispatch(setIsModalOpen(false));
                 dispatch(setSelectedItem(null));
                 dispatch(setShouldRefreshHome(true));
-               
+
 
             } else {
                 messageApi.error("Xoá không thành công")

@@ -22,6 +22,8 @@ function CreatePiepScreen() {
     onSubmitCreatePiep,
     handleOpenMedia,
     handleMediaChange,
+    checkEdit,
+    onEdit,
   } = useCreatePiepController();
   return (
     <Modal
@@ -30,6 +32,7 @@ function CreatePiepScreen() {
       onCancel={onCloseCreate}
       open={isModelCreatePiep}
       footer={null}
+      zIndex={1100}
       styles={{
         body: {
           maxHeight: "80vh",
@@ -186,10 +189,10 @@ function CreatePiepScreen() {
         </div>
         <div className="footer pt-2.5 text-end cursor-pointer">
           <button
-            onClick={onSubmitCreatePiep}
+            onClick={checkEdit ? onEdit : onSubmitCreatePiep}
             className={`${isLoading ? "bg-[#f4f4f4]" : "bg-[#f3495b]"} ${isLoading ? "text-[#999]" : "text-white"} px-4 py-2 rounded-lg cursor-pointer`}
           >
-            {t("submit_post_create")}
+            {checkEdit ? t("Lưu") : t("submit_post_create")}
           </button>
         </div>
       </div>

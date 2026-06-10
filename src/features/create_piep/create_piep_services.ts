@@ -4,7 +4,9 @@ import { ContentImg } from "@/model/upload_media";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from '../../lib/baseQuery';
 
-interface CreatePostBody {
+export interface CreatePostBody {
+    PP300?:number;
+    FT300?:number;
     PV301: string;
     PV305: string;
     PL348?: string;
@@ -43,6 +45,19 @@ export const creataPiepApi = createApi({
                 body: formData,
             }),
         }),
+         // PP300, FT300, PV301, PV305, FO100, PO322 
+        updatePost: builder.mutation<BaseResponseObject<number>, {
+            PP300: number, FT300: number, FO100: number, PV301: string, PV305: string, PO322?: {
+                image: ContentImg[];
+                video: ContentImg[];
+            }
+        }>({
+            query: ({ PP300, FT300, FO100, PV301, PV305, PO322 }) => ({
+                url: "updatePost",
+                method: "POST",
+                body: { PP300, FT300, FO100, PV301, PV305, PO322 }
+            })
+        }),
     }),
 });
 
@@ -50,4 +65,5 @@ export const {
     useCreatePiepMutation,
     // useUploadImgMutation,
     useUploadImgVideoMutation,
+    useUpdatePostMutation,
 } = creataPiepApi
