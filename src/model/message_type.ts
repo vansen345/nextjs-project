@@ -15,5 +15,7 @@ export interface IMessage {
   receiverId?: string;
   receiverEmail?: string;
   receiverAvatar?: string;
+  senderName?:string;
+  receiverName?:string;
   createdAt: string;
 }
