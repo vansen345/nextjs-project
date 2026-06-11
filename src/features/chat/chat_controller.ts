@@ -16,7 +16,7 @@ export const useChatController = () => {
         onReceiveMessage,
     } = useSocket();
 
-    const { session, userId, userEmail, NV126 } = useAuth();
+    const { session, userId, userEmail, NV126, NV106 } = useAuth();
 
     const { t } = useTranslation(undefined, { i18n });
 
@@ -75,6 +75,10 @@ export const useChatController = () => {
 
         if (!selectedConversationId || isLoadingRefDetailList.current || (!isInitial && !hasMoreRefDetail.current)) return;
         isLoadingRefDetailList.current = true;
+
+        if (isInitial) {
+            setHistoryMessages([]);
+        }
 
         const { data } = await triggerDetailConversation({
             conversationId: selectedConversationId,
@@ -137,7 +141,7 @@ export const useChatController = () => {
 
 
                 setListConversation(prev =>
-                    isInitial ? newItems : [...prev, ...newItems] 
+                    isInitial ? newItems : [...prev, ...newItems]
                 )
 
 
@@ -247,6 +251,8 @@ export const useChatController = () => {
                 senderAvatar: NV126 || "",
                 receiverId: selectedUserId._id,
                 receiverAvatar: selectedUserId.NV126,
+                senderName: NV106 || "",
+                receiverName: selectedUserId.NV106 || ''
             }).unwrap();
             setInputMessage("");
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
