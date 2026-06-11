@@ -87,7 +87,7 @@ export const useChatController = () => {
         })
         if (data?.elements) {
             const newItems = data.elements;
-            setHistoryMessages(prev => isInitial ? newItems : [...newItems, ...prev]); // prepend khi load more
+            setHistoryMessages(prev => isInitial ? newItems : [...newItems, ...prev]);
             offsetRefDetail.current = newOffset + LIMIT;
             hasMoreRefDetail.current = newItems.length === LIMIT;
         }
@@ -215,28 +215,6 @@ export const useChatController = () => {
         });
         return () => { cleanup?.(); };
     }, [selectedConversationId, onReceiveMessage]);
-
-
-    // const allMessages = useMemo(() => {
-    //     const history = historyMessages?.elements || [];
-    //     const map = new Map<string, IMessage>();
-    //     [...history, ...realtimeMessages].forEach((msg) => {
-    //         map.set(msg?._id || '', msg);
-    //     });
-    //     const messages = Array.from(map.values());
-
-    //     return messages.map((msg, index) => {
-    //         const prev = index === 0 ? null : messages[index - 1];
-    //         const isShowDateTitle = prev === null ||
-    //             new Date(msg.createdAt).getDate() !== new Date(prev.createdAt).getDate();
-    //         const rs = getDateName(msg.createdAt);
-    //         const timeHead = rs.label.length > 0 ? t(rs.label) : rs.val;
-    //         console.log(t('time_today'));
-    //         return { ...msg, isShowDateTitle, timeHead };
-    //     });
-    // }, [historyMessages, realtimeMessages, t]);
-
-
 
     const handleSend = async () => {
         if (!inputMessage.trim()) return;

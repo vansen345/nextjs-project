@@ -46,6 +46,9 @@ function Header() {
     isModelCreatePiep,
     isModalLogin,
     isModalRegister,
+    hasNewMessage,
+    setHasNewMessage,
+    stopBlinking
   } = useHeaderController();
 
   const { FO100 } = useAuth();
@@ -127,14 +130,23 @@ function Header() {
             </Button>
 
             <Tooltip>
-              {isLoggedIn && (
-                <Button
-                  shape="circle"
-                  icon={<span className="fpme-piep-and-call"></span>}
-                  onClick={() => handleClick("/chat")}
-                  className={`button-chat hidden md:flex ${getColor2("chat")}`}
-                />
-              )}
+              <div className="icon-chat relative">
+                {isLoggedIn && (
+                  <Button
+                    shape="circle"
+                    icon={<span className="fpme-piep-and-call"></span>}
+                    onClick={() => {
+                      setHasNewMessage(false);
+                      handleClick("/chat");
+                      stopBlinking();
+                    }}
+                    className={`button-chat hidden md:flex ${getColor2("chat")}`}
+                  />
+                )}
+                {hasNewMessage && (
+                  <div className="bage h-2 w-2 absolute top-0 right-1.5 rounded-[50px] bg-[#f56c6c]"></div>
+                )}
+              </div>
             </Tooltip>
             <Tooltip>
               <Button
