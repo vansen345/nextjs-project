@@ -1,7 +1,10 @@
 'use client'
 
+import { RootState } from "@/store";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setHasNewMessage } from "./notificationMessage";
 import { useAuth } from "./useAuth";
 import { useSocket } from "./useSocket";
 
@@ -9,8 +12,11 @@ import { useSocket } from "./useSocket";
 
 export const useNewMessageNotification = () => {
     const { onReceiveMessage, joinRoom } = useSocket();
+    const hasNewMessage = useSelector((state: RootState) => state.notificationMessage.hasNewMessage);
+
+    const dispatch = useDispatch();
     const { userId } = useAuth();
-    const [hasNewMessage, setHasNewMessage] = useState(false);
+    // const [hasNewMessage, setHasNewMessage] = useState(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const senderNameRef = useRef<string>('');
     const pathname = usePathname();
@@ -31,26 +37,40 @@ export const useNewMessageNotification = () => {
         }, 500);
     };
 
-    const stopBlinking = () => {
-        console.log("STOP BLINKING");
+    const stopBlinking = useCallback(() => {
+        console.log("STOP BLINKING", intervalRef.current);
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (pathname.startsWith("/chat")) {
+            stopBlinking();
+        }
+    }, [pathname]);
 
     useEffect(() => {
         console.log("register listener");
         const cleanup = onReceiveMessage((data) => {
-            console.log(data);
+            console.log(
+                'RECEIVE',
+                {
+                    id: data._id,
+                    senderId: data.senderId,
+                    message: data.message,
+                    pathname: pathname
+                }
+            );
             if (data.senderId === userId) return;
             if (!pathname.startsWith("/chat")) {
-                setHasNewMessage(true);
+                dispatch(setHasNewMessage(true)) ;
                 startBlinking(data.senderName || 'Tin nhắn mới');
             }
         });
         return () => {
-            console.log("unregister listener");
+            console.log("unregister listener", pathname);
             cleanup?.();
         };
     }, [onReceiveMessage, pathname]);

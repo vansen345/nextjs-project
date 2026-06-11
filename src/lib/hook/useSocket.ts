@@ -16,21 +16,20 @@ export const useSocket = () => {
 
     useEffect(() => {
         const s = getSocket();
-
         socketRef.current = s;
         if (!s.connected) {
             s.connect();
         }
 
         const handleConnect = () => {
-            console.log("✅ Socket connected:", s.id);
+            // console.log("✅ Socket connected:", s.id);
             setIsConnected(true);
         };
 
         const handleDisconnect = () => {
-            console.log("❌ Socket disconnected");
+            // console.log("❌ Socket disconnected");
             setIsConnected(false);
-        };
+        };    
 
         s.on("connect", handleConnect);
         s.on("disconnect", handleDisconnect);
@@ -56,7 +55,7 @@ export const useSocket = () => {
         };
     };
 
-    const likePost = (PP300: number, FO100: number,isLiked: boolean) => {
+    const likePost = (PP300: number, FO100: number, isLiked: boolean) => {
         socketRef.current?.emit('likePost', { PP300, FO100, isLiked });
     };
 

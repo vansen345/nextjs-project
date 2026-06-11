@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useHeaderController } from "@/features/header/header_controller";
 import { useLazyGetHomeListQuery } from "@/features/home/home_api";
 import i18n from "@/i18n";
+import { setHasNewMessage } from "@/lib/hook/notificationMessage";
 import { useAuth } from "@/lib/hook/useAuth";
 import { UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -27,10 +28,7 @@ import "./header_style.css";
 type SizeType = ConfigProviderProps["componentSize"];
 
 function Header() {
-  const [pageTitle, setPageTitle] = useState("PiepMe");
-  useEffect(() => {
-    document.title = pageTitle;
-  }, [pageTitle]);
+  
   const { t } = useTranslation(undefined, { i18n });
   const currentLang = i18n.language;
   const [size] = useState<SizeType>("large");
@@ -41,14 +39,13 @@ function Header() {
     onOpenLogin,
     onLogout,
     onOpenCreatePiep,
+    dispatch,
     NV126,
     isLoggedIn,
     isModelCreatePiep,
     isModalLogin,
     isModalRegister,
     hasNewMessage,
-    setHasNewMessage,
-    stopBlinking
   } = useHeaderController();
 
   const { FO100 } = useAuth();
@@ -59,10 +56,22 @@ function Header() {
     document.body.classList.add("hydrated");
   }, []);
 
-  const handleLogoClick = (title: string = "Cộng đồng") => {
-    setPageTitle(title);
-    router.push("/");
-    fetchHome({ limit: 10, offset: 0, FO100: FO100 || 0 });
+  const handleLogoClick = (
+    type: "community" | "audio" | "now" = "community",
+  ) => {
+    const routeMap = {
+      community: "/community",
+      audio: "/audio",
+      now: "/now",
+    };
+
+    router.push(routeMap[type]);
+
+    fetchHome({
+      limit: 10,
+      offset: 0,
+      FO100: FO100 || 0,
+    });
   };
 
   return (
@@ -100,20 +109,20 @@ function Header() {
 
           <div className="menu-text hidden md:flex gap-4 mr-8 shrink-0">
             <p
-              className={`text-header ${getColor2("/")}`}
-              onClick={() => handleLogoClick("Cộng đồng")}
+              className={`text-header ${getColor2("/community")}`}
+              onClick={() => handleLogoClick("community")}
             >
               Cộng đồng
             </p>
             <p
-              className={`text-header ${getColor2("piepAudio")}`}
-              onClick={() => handleLogoClick("PiepAUDIO")}
+              className={`text-header ${getColor2("/audio")}`}
+              onClick={() => handleLogoClick("audio")}
             >
               PiepAUDIO
             </p>
             <p
-              className={`text-header ${getColor2("vietnam")}`}
-              onClick={() => handleLogoClick("Việt Nam Bây Giờ")}
+              className={`text-header ${getColor2("/now")}`}
+              onClick={() => handleLogoClick("now")}
             >
               Việt Nam Bây Giờ
             </p>
@@ -136,9 +145,8 @@ function Header() {
                     shape="circle"
                     icon={<span className="fpme-piep-and-call"></span>}
                     onClick={() => {
-                      setHasNewMessage(false);
+                      dispatch(setHasNewMessage(false));
                       handleClick("/chat");
-                      stopBlinking();
                     }}
                     className={`button-chat hidden md:flex ${getColor2("chat")}`}
                   />

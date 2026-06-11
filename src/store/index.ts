@@ -10,6 +10,7 @@ import authReducer from "@/features/login/authen_slice";
 import { loginApi } from "@/features/login/login_services";
 import { profileApi } from "@/features/profile/profile_services";
 import { registerApi } from "@/features/register/register_services";
+import notificationMessageSlice from "@/lib/hook/notificationMessage";
 import { configureStore } from "@reduxjs/toolkit";
 
 export const store = configureStore({
@@ -19,13 +20,14 @@ export const store = configureStore({
     [registerApi.reducerPath]: registerApi.reducer,
     [loginApi.reducerPath]: loginApi.reducer,
     [chatApi.reducerPath]: chatApi.reducer,
-    [creataPiepApi.reducerPath]:creataPiepApi.reducer,
-    [commentApi.reducerPath]:commentApi.reducer,
-    [profileApi.reducerPath]:profileApi.reducer,
+    [creataPiepApi.reducerPath]: creataPiepApi.reducer,
+    [commentApi.reducerPath]: commentApi.reducer,
+    [profileApi.reducerPath]: profileApi.reducer,
     detail: detailReducer,
     header: headerReducer,
     auth: authReducer,
-    createPiep:createReducer,
+    createPiep: createReducer,
+    notificationMessage: notificationMessageSlice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()

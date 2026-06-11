@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/lib/hook/useAuth";
-import { useNewMessageNotification } from "@/lib/hook/useNewMessageNotification";
 import { RootState } from "@/store";
 import { signOut } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,7 +17,8 @@ export const useHeaderController = () => {
   const isModelCreatePiep = useSelector((state: RootState) => state.header.isModelCreatePiep);
   const isModalLogin = useSelector((state: RootState) => state.header.isModalLogin);
   const isModalRegister = useSelector((state: RootState) => state.header.isModalRegister);
-  const { hasNewMessage, setHasNewMessage, stopBlinking } = useNewMessageNotification();
+  const hasNewMessage = useSelector((state: RootState) => state.notificationMessage.hasNewMessage);
+  // const { stopBlinking } = useNewMessageNotification();
 
   // const avatar = session?.user?.NV126;
   // const isLoggedIn = !!session;
@@ -33,10 +33,10 @@ export const useHeaderController = () => {
   };
 
   const getColor2 = (path: string): string => {
-    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-    if (normalizedPath === "/") return pathname === "/" ? "button-active" : "button-inactive";
-    return pathname === normalizedPath ? "button-active" : "button-inactive";
-  };
+  return pathname === path
+    ? "button-active"
+    : "button-inactive";
+};
 
   const onOpenRegister = () => dispatch(setIsModalOpenRegiser(true));
   const onOpenLogin = () => dispatch(setIsModalOpenLogin(true));
@@ -47,6 +47,6 @@ export const useHeaderController = () => {
   };
   const onOpenCreatePiep = () => dispatch(setIsModalCreatePiep(true));
 
-  return { handleClick, getColor2, onOpenRegister, onCloseRegister, onOpenLogin, onLogout, onOpenCreatePiep, stopBlinking, isModelCreatePiep, isModalLogin, isModalRegister, NV126, isLoggedIn, hasNewMessage, setHasNewMessage };
+  return { handleClick, getColor2, onOpenRegister,dispatch, onCloseRegister, onOpenLogin, onLogout, onOpenCreatePiep, isModelCreatePiep, isModalLogin, isModalRegister, NV126, isLoggedIn, hasNewMessage, };
 };
 
