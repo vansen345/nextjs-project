@@ -4,9 +4,10 @@ import { setIsModalOpenLogin } from "@/features/header/header_redux_slice";
 import { useProfileController } from "@/features/profile/profile_controller";
 import { getTimeText } from "@/lib/util";
 import { getDecryptedTitle } from "@/model/home_type";
+import { UserType } from "@/model/user_type";
 import { Avatar, Divider, Image, Masonry } from "antd";
 
-function ProfileScreen({ FO100 }: { FO100: number }) {
+function ProfileScreen({ FO100, initialProfile }: { FO100: number, initialProfile: UserType | null }) {
   const {
     profile,
     listPost,
@@ -15,7 +16,7 @@ function ProfileScreen({ FO100 }: { FO100: number }) {
     handleItemClick,
     handleLike,
     dispatch,
-  } = useProfileController(FO100);
+  } = useProfileController(FO100,initialProfile);
   return (
     <div className="w-full h-full">
       <div className="max-w-215 min-h-[calc(100vh-70px)] shadow-[0_0_7px_0_rgba(0,0,0,0.15)] px-2.5 pt-2.5 pb-1.25 bg-white mt-3 mx-auto rounded-[15px]">

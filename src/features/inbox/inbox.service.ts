@@ -4,10 +4,10 @@ import { ConversationType } from "@/model/user_type";
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from '../../lib/baseQuery';
 
-export const chatApi = createApi({
-    reducerPath: "chatApi",
+export const inboxApi = createApi({
+    reducerPath: "inboxApi",
     baseQuery,
-    tagTypes: ["Chat"],
+    tagTypes: ["Inbox"],
     endpoints: (builder) => ({
 
         getMessages: builder.query<BaseResponse<IMessage[]>, { conversationId: number,limit:number,offset:number }>({
@@ -24,7 +24,7 @@ export const chatApi = createApi({
                 method: "POST",
                 body,
             }),
-            invalidatesTags: ["Chat"],
+            invalidatesTags: ["Inbox"],
         }),
 
         getListCoversation: builder.query<BaseResponse<ConversationType[]>, { limit: number; offset: number, email: string }>({
@@ -46,4 +46,4 @@ export const {
     useSaveMessageMutation,
     useGetListCoversationQuery,
     useLazyGetListCoversationQuery,
-} = chatApi;
+} = inboxApi;

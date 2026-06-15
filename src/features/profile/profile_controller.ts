@@ -7,14 +7,14 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 import { useDispatch } from "react-redux";
 import slugify from "slugify";
 import { setIsModalOpen, setSelectedItem } from "../detail/detail_redux_slice";
-import { useGetInfoProfileMutation, useLazyGetListPostByUserQuery } from "./profile_services";
+import { useLazyGetListPostByUserQuery } from "./profile_services";
 
-export const useProfileController = (FO100: number) => {
+export const useProfileController = (FO100: number, initialProfile: UserType | null) => {
     const { likePost } = useSocket();
     const { isLoggedIn } = useAuth();
-    const [profile, setProfile] = useState<UserType | null>(null);
+    const [profile, setProfile] = useState<UserType | null>(initialProfile); 
     const [listPost, setListPost] = useState<HomeItem[]>([]);
-    const [triggerProfile] = useGetInfoProfileMutation();
+    // bỏ triggerProfile vì server đã fetch rồi
     const [triggerListPost] = useLazyGetListPostByUserQuery();
     const isLoadingRef = useRef(false);
     const offsetRef = useRef(0);
@@ -23,16 +23,7 @@ export const useProfileController = (FO100: number) => {
     const dispatch = useDispatch();
     const LIMIT = 10;
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            setProfile(null);
-            const rs = await triggerProfile({ FO100: FO100 }).unwrap();
-            if (rs.elements != null) {
-                setProfile(rs.elements);
-            }
-        }
-        fetchProfile();
-    }, [FO100]);
+    // bỏ hoàn toàn useEffect fetch profile
 
     const fetchListPiepByUser = useCallback(async (newOffSet: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
@@ -48,15 +39,12 @@ export const useProfileController = (FO100: number) => {
                 setListPost(prev => isInitial ? newItems : [...newItems, ...prev]);
                 offsetRef.current = newOffSet + LIMIT;
                 hasMoreRef.current = newHasMore;
-                console.log(listPost.length);
-                
             }
             isLoadingRef.current = false;
             NProgress.done();
 
         } catch (error) {
             console.log(error);
-
         }
     }, [triggerListPost, FO100])
 
@@ -103,9 +91,7 @@ export const useProfileController = (FO100: number) => {
         };
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    })
+    });
 
-
-
-    return { profile, listPost, dispatch, isLoggedIn, bottomRef,handleItemClick, handleLike };
+    return { profile, listPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike };
 }

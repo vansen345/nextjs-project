@@ -33,10 +33,10 @@ export const useHeaderController = () => {
   };
 
   const getColor2 = (path: string): string => {
-  return pathname === path
-    ? "button-active"
-    : "button-inactive";
-};
+    return pathname === path
+      ? "button-active"
+      : "button-inactive";
+  };
 
   const onOpenRegister = () => dispatch(setIsModalOpenRegiser(true));
   const onOpenLogin = () => dispatch(setIsModalOpenLogin(true));
@@ -47,6 +47,6 @@ export const useHeaderController = () => {
   };
   const onOpenCreatePiep = () => dispatch(setIsModalCreatePiep(true));
 
-  return { handleClick, getColor2, onOpenRegister,dispatch, onCloseRegister, onOpenLogin, onLogout, onOpenCreatePiep, isModelCreatePiep, isModalLogin, isModalRegister, NV126, isLoggedIn, hasNewMessage, };
+  return { handleClick, getColor2, onOpenRegister, dispatch, onCloseRegister, onOpenLogin, onLogout, onOpenCreatePiep, isModelCreatePiep, isModalLogin, isModalRegister, NV126, isLoggedIn, hasNewMessage, };
 };
 

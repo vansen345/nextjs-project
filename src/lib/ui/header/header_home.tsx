@@ -146,7 +146,7 @@ function Header() {
                     icon={<span className="fpme-piep-and-call"></span>}
                     onClick={() => {
                       dispatch(setHasNewMessage(false));
-                      handleClick("/chat");
+                      handleClick("/inbox");
                     }}
                     className={`button-chat hidden md:flex ${getColor2("chat")}`}
                   />

@@ -1,15 +1,14 @@
-import i18n from '@/i18n';
-import { useAuth } from '@/lib/hook/useAuth';
+import i18n from "@/i18n";
+import { useAuth } from "@/lib/hook/useAuth";
 import { useSocket } from "@/lib/hook/useSocket";
 import { getDateName } from "@/lib/util";
 import { IMessage } from "@/model/message_type";
 import { ConversationType, UserType } from "@/model/user_type";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from 'react-i18next';
-import { useLazyGetListCoversationQuery, useLazyGetMessagesQuery, useSaveMessageMutation } from "./chat_services";
+import { useTranslation } from "react-i18next";
+import { useLazyGetListCoversationQuery, useLazyGetMessagesQuery, useSaveMessageMutation } from "./inbox.service";
 
-export const useChatController = () => {
-
+export const useInboxController = (conversationId: number) => {
     const {
         isConnected,
         joinRoom,
@@ -25,21 +24,12 @@ export const useChatController = () => {
     const [inputMessage, setInputMessage] = useState("");
 
     const [realtimeMessages, setRealtimeMessages] = useState<IMessage[]>([]);
-
-
-    const [selectedUserId, setSelectedUserId] = useState<UserType | null>(null);
-
+    // const [selectedUserId, setSelectedUserId] = useState<UserType | null>(null);
     const [saveMessage] = useSaveMessageMutation();
 
-    // const userId = session?.user?.id;
-
-
-    const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
-
-    // const { data: historyMessages } = useGetMessagesQuery(
-    //     { conversationId: selectedConversationId || 0 },
-    //     { skip: !selectedConversationId }
-    // );
+    const selectedConversationId = conversationId
+        ? conversationId
+        : null;
 
     const [listConversation, setListConversation] = useState<ConversationType[]>([])
     const [hasMore, setHasMore] = useState(true)
@@ -59,16 +49,12 @@ export const useChatController = () => {
     const LIMIT = 20;
 
     const chatListRef = useRef<HTMLDivElement>(null);
-
+    const selectedUserRef = useRef<UserType | null>(null);
 
     useEffect(() => {
-
         if (isConnected && userId) {
-
             joinRoom(userId);
-
         }
-
     }, [isConnected, userId]);
 
     const fetchDetailConversation = useCallback(async (newOffset: number, isInitial = false) => {
@@ -92,7 +78,7 @@ export const useChatController = () => {
             hasMoreRefDetail.current = newItems.length === LIMIT;
         }
         isLoadingRefDetailList.current = false;
-    }, [triggerDetailConversation, selectedConversationId])
+    }, [triggerDetailConversation, selectedConversationId]);
 
     const allMessages = useMemo(() => {
         const map = new Map<string, IMessage>();
@@ -127,6 +113,19 @@ export const useChatController = () => {
         fetchDetailConversation(0, true);
     }, [selectedConversationId]);
 
+
+
+    useEffect(() => {
+    if (!selectedConversationId || !listConversation.length) return;
+
+    const found = listConversation.find(
+        (c) => c.conversationId === selectedConversationId
+    );
+    if (found) {
+        selectedUserRef.current = found;
+    }
+}, [selectedConversationId, listConversation]);
+
     const fetchListConversation = useCallback(async (newOffset: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return
         isLoadingRef.current = true
@@ -135,7 +134,7 @@ export const useChatController = () => {
             const { data } = await trigger({ limit: LIMIT, offset: newOffset, email: userEmail || "" })
             isLoadingRef.current = false
             if (data?.elements) {
-                const newItems = data.elements.filter(
+                const newItems = data.elements.filter( 
                     (item) => item.email !== userEmail
                 )
 
@@ -155,9 +154,6 @@ export const useChatController = () => {
         }
     }, [trigger, userEmail]);
 
-
-
-
     useEffect(() => {
         if (!userId || !userEmail || hasFetchedRef.current) return
         hasFetchedRef.current = true
@@ -166,7 +162,6 @@ export const useChatController = () => {
         fetchListConversation(0, true)
     }, [userId, userEmail, fetchListConversation])
 
-    // Scroll trong div
     useEffect(() => {
         const el = listRef.current
         if (!el) return
@@ -194,7 +189,7 @@ export const useChatController = () => {
         }
         el.addEventListener("scroll", handleScrollDetailListConversation);
         return () => el.removeEventListener("scroll", handleScrollDetailListConversation)
-    }, [fetchDetailConversation])
+    }, [fetchDetailConversation]);
 
     useEffect(() => {
         const cleanup = onReceiveMessage((data) => {
@@ -218,7 +213,7 @@ export const useChatController = () => {
 
     const handleSend = async () => {
         if (!inputMessage.trim()) return;
-        if (!selectedUserId) return;
+        if (!selectedUserRef.current) return;
 
         try {
             await saveMessage({
@@ -227,10 +222,10 @@ export const useChatController = () => {
                 senderId: userId || "",
                 senderEmail: userEmail || "",
                 senderAvatar: NV126 || "",
-                receiverId: selectedUserId._id,
-                receiverAvatar: selectedUserId.NV126,
+                receiverId: selectedUserRef.current._id,
+                receiverAvatar: selectedUserRef.current.NV126,
                 senderName: NV106 || "",
-                receiverName: selectedUserId.NV106 || ''
+                receiverName: selectedUserRef.current.NV106 || ''
             }).unwrap();
             setInputMessage("");
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -238,7 +233,6 @@ export const useChatController = () => {
             console.log(error);
         }
     };
-
     return {
         listConversation, isFetching, hasMore, listRef,
         inputMessage,
@@ -249,11 +243,10 @@ export const useChatController = () => {
         bottomRef,
         isConnected,
         session,
-        selectedUserId,
-        setSelectedUserId,
-        setSelectedConversationId,
+        selectedUserRef,
+        // selectedUserId,
+        // setSelectedUserId,
         selectedConversationId
     };
-};
 
-
+}

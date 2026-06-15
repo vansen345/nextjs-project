@@ -1,9 +1,9 @@
 "use client";
 
-import { useChatController } from "@/features/chat/chat_controller";
+import { useInboxController } from "@/features/inbox/inbox_controller";
 import { formatDateWithType } from "@/lib/util";
 import { Avatar, Input } from "antd";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -17,7 +17,9 @@ import {
 } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 // import './chat_style.css';
-
+type InboxScreenProps = {
+  conversationId: number;
+};
 const ellipsisStyle: React.CSSProperties = {
   fontSize: 12,
   overflow: "hidden",
@@ -26,10 +28,9 @@ const ellipsisStyle: React.CSSProperties = {
   fontWeight: "600",
 };
 
-function ChatScreen() {
-  useEffect(() => {
-    document.body.classList.add("hydrated");
-  }, []);
+function InboxScreen({ conversationId }: InboxScreenProps) {
+  const router = useRouter();
+
   const users = [
     { id: 1, name: "Alice", avatar: "https://i.pravatar.cc/150?img=1" },
     { id: 2, name: "Bob", avatar: "https://i.pravatar.cc/150?img=2" },
@@ -52,11 +53,13 @@ function ChatScreen() {
     chatListRef,
     session,
     listConversation,
-    setSelectedUserId,
-    selectedUserId,
+    selectedConversationId,
+    selectedUserRef,
+    // setSelectedUserId,
+    // selectedUserId,
     // selectedConversationId,
-    setSelectedConversationId,
-  } = useChatController();
+  } = useInboxController(conversationId);
+
   return (
     <div className="chat-page bg-[#f2f2f6] relative z-10 flex gap-5 w-full h-[calc(100vh-80px)] overflow-hidden p-5 ">
       <div className="list-coversation shadow-[0_4px_16px_rgba(0,0,0,0.15)] bg-white w-95 h-full p-2.5 rounded-lg flex flex-col">
@@ -95,16 +98,20 @@ function ChatScreen() {
 
         <div className="list-user-conversation flex-1 overflow-y-auto">
           <div className="content-chat-conversation flex flex-col  gap-1.5 pt-3.5 pl-1.5 ">
-            {listConversation.map((conversation, index) => {
-              const isSelected = conversation._id === selectedUserId?._id;
+            {listConversation.map((conversation, index) => { 
+              const isSelected = conversation.conversationId === selectedConversationId;
               return (
                 <div
                   key={index}
                   className={`flex items-center gap-1.5 cursor-pointer p-2.5 rounded-[10px] ${isSelected ? "bg-[#f2f2f6]" : "hover:bg-gray-200"}`}
                   onClick={() => {
-                    setSelectedUserId(conversation);
-                    setSelectedConversationId(conversation.conversationId);
-                  }}
+                    selectedUserRef.current = conversation;
+                    router.replace(
+                      `/inbox?conversationId=${conversation.conversationId}`,
+                    );
+                    // setSelectedUserId(conversation);
+                    // //   setSelectedConversationId(conversation.conversationId);
+                  }} 
                 >
                   <Avatar src={conversation.NV126} size={52} />
                   <div>
@@ -158,7 +165,7 @@ function ChatScreen() {
 
           <div ref={bottomRef} />
         </div>
-        {selectedUserId?._id && (
+        {selectedConversationId && (
           <div className="input-chat p-4 flex gap-2 shrink-0">
             <Input
               placeholder="Nhập tin nhắn..."
@@ -186,8 +193,9 @@ function ChatScreen() {
           </div>
         )}
       </div>
+      <div className="right-chat h-full bg-white rounded-lg"></div>
     </div>
   );
 }
 
-export default ChatScreen;
+export default InboxScreen;
