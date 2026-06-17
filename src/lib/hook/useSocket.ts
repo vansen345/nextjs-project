@@ -29,7 +29,7 @@ export const useSocket = () => {
         const handleDisconnect = () => {
             // console.log("❌ Socket disconnected");
             setIsConnected(false);
-        };    
+        };
 
         s.on("connect", handleConnect);
         s.on("disconnect", handleDisconnect);
@@ -64,6 +64,14 @@ export const useSocket = () => {
         return () => socketRef.current?.off('likePost', callback);
     };
 
+    const listenOnRequestFriend = (callback: (data: { FO100S: number, NV106: string, NV126: string }) => void) => {
+        socketRef.current?.on('friendRequest', callback);
+        return () => socketRef.current?.off('friendRequest', callback);
+    }
+    const listenOnAcceptFriend = (callback: (data: { FO100R: number, NV106: string, NV126: string }) => void) => {
+        socketRef.current?.on('friendRequestAccepted', callback);
+        return () => socketRef.current?.off('friendRequestAccepted', callback);
+    }
     return {
         isConnected,
         likePost,
@@ -71,6 +79,8 @@ export const useSocket = () => {
         disconnectSocket,
         joinRoom,
         onReceiveMessage,
+        listenOnRequestFriend,
+        listenOnAcceptFriend
     };
 };
 

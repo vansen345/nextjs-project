@@ -27,9 +27,9 @@ export const inboxApi = createApi({
             invalidatesTags: ["Inbox"],
         }),
 
-        getListCoversation: builder.query<BaseResponse<ConversationType[]>, { limit: number; offset: number, email: string }>({
+        getListCoversation: builder.query<BaseResponse<ConversationType[]>, { limit: number; offset: number, email: string,FO100:number }>({
             query: (params) => ({
-                url: `/chat/listConversation?limit=${params.limit}&offset=${params.offset}`,
+                url: `/chat/listConversation?limit=${params.limit}&offset=${params.offset}&FO100=${params.FO100}`,
                 method: "GET",
                 headers: {
                     "x-user-email": params.email || ""

@@ -13,6 +13,7 @@ import { setIsModalOpen, setLikeUpdate, setSelectedItem } from "./detail_redux_s
 
 export const useDetailPageController = () => {
     const { likePost } = useSocket();
+   
     const selectedItem = useSelector((state: RootState) => state.detail.selectedItem);
     const [triggerAPI] = useDetailPieperMutation();
     const [detail, setDetail] = useState<HomeItem | null>(null);
@@ -107,6 +108,10 @@ export const useDetailPageController = () => {
         }
     }
 
-    return { detail, isLoading, isModalOpen, isLoggedIn, dropdownOpen, dispatch, setDropdownOpen, handleCancel, handleLike, onDeletePostUser };
+    const onOpenProfile =()=>{
+       window.open(`/profile/${selectedItem?.FO100}`, "_blank");
+    }
+
+    return { detail, isLoading, isModalOpen, isLoggedIn, dropdownOpen, dispatch, setDropdownOpen, handleCancel, handleLike, onDeletePostUser,onOpenProfile };
 
 }

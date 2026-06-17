@@ -15,7 +15,7 @@ export const useInboxController = (conversationId: number) => {
         onReceiveMessage,
     } = useSocket();
 
-    const { session, userId, userEmail, NV126, NV106 } = useAuth();
+    const { session, userId, userEmail, NV126, NV106, FO100 } = useAuth();
 
     const { t } = useTranslation(undefined, { i18n });
 
@@ -116,25 +116,25 @@ export const useInboxController = (conversationId: number) => {
 
 
     useEffect(() => {
-    if (!selectedConversationId || !listConversation.length) return;
+        if (!selectedConversationId || !listConversation.length) return;
 
-    const found = listConversation.find(
-        (c) => c.conversationId === selectedConversationId
-    );
-    if (found) {
-        selectedUserRef.current = found;
-    }
-}, [selectedConversationId, listConversation]);
+        const found = listConversation.find(
+            (c) => c.conversationId === selectedConversationId
+        );
+        if (found) {
+            selectedUserRef.current = found;
+        }
+    }, [selectedConversationId, listConversation]);
 
     const fetchListConversation = useCallback(async (newOffset: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return
         isLoadingRef.current = true
 
         try {
-            const { data } = await trigger({ limit: LIMIT, offset: newOffset, email: userEmail || "" })
+            const { data } = await trigger({ limit: LIMIT, offset: newOffset, email: userEmail || "", FO100: FO100 || 0 })
             isLoadingRef.current = false
             if (data?.elements) {
-                const newItems = data.elements.filter( 
+                const newItems = data.elements.filter(
                     (item) => item.email !== userEmail
                 )
 

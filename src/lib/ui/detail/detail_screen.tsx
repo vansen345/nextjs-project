@@ -26,6 +26,7 @@ function DetailScreen() {
     dispatch,
     setDropdownOpen,
     onDeletePostUser,
+    onOpenProfile,
   } = useDetailPageController();
   const { isLoggedIn, FO100 } = useAuth();
 
@@ -102,7 +103,7 @@ function DetailScreen() {
         }}
       >
         <div className="info-user-piep w-full absolute -top-11 left-0 flex items-center justify-between">
-          <div className="info">
+          <div className="info cursor-pointer" onClick={onOpenProfile} >
             <Avatar
               size="large"
               shape="circle"

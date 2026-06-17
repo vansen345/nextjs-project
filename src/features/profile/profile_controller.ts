@@ -7,12 +7,12 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 import { useDispatch } from "react-redux";
 import slugify from "slugify";
 import { setIsModalOpen, setSelectedItem } from "../detail/detail_redux_slice";
-import { useLazyGetListPostByUserQuery } from "./profile_services";
+import { useAcceptFriendMutation, useCancelRequestMutation, useLazyGetListPostByUserQuery, useRejectFriendMutation, useSendRequestMutation } from "./profile_services";
 
 export const useProfileController = (FO100: number, initialProfile: UserType | null) => {
     const { likePost } = useSocket();
-    const { isLoggedIn } = useAuth();
-    const [profile, setProfile] = useState<UserType | null>(initialProfile); 
+    const { isLoggedIn, FO100: myPost } = useAuth();
+    const [profile, setProfile] = useState<UserType | null>(initialProfile);
     const [listPost, setListPost] = useState<HomeItem[]>([]);
     // bỏ triggerProfile vì server đã fetch rồi
     const [triggerListPost] = useLazyGetListPostByUserQuery();
@@ -22,8 +22,13 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
     const bottomRef = useRef<HTMLDivElement>(null);
     const dispatch = useDispatch();
     const LIMIT = 10;
-
-    // bỏ hoàn toàn useEffect fetch profile
+    const [callApiAccept] = useAcceptFriendMutation();
+    const [callApiSend] = useSendRequestMutation();
+    const [friendStatus, setFriendStatus] = useState<"none" | "pending" | "accepted">(
+        (initialProfile?.FRIEND_STATUS as "none" | "pending" | "accepted") ?? "none"
+    );
+    const [callApiCancelRequest] = useCancelRequestMutation();
+    const [callApiRejectFriend] = useRejectFriendMutation();
 
     const fetchListPiepByUser = useCallback(async (newOffSet: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
@@ -93,5 +98,72 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
         return () => window.removeEventListener("scroll", handleScroll);
     });
 
-    return { profile, listPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike };
+    // useEffect(() => {
+    //     const cleanup = listenOnRequestFriend((data) => {
+    //         if (data.FO100S === FO100) {
+    //             setStatusFriend("pending");
+    //         }
+    //     });
+    //     return () => { cleanup?.(); };
+    // }, [FO100]);
+
+    // useEffect(() => {
+    //     const cleanup = listenOnAcceptFriend((data) => {
+    //         if (data.FO100R === FO100) {
+    //             setStatusFriend("accepted");
+    //         }
+    //     });
+    //     return () => { cleanup?.(); };
+    // }, [FO100]);
+
+    const handleSendRequest = async () => {
+        try {
+            const rs = await callApiSend({ FO100S: myPost || 0, FO100R: FO100 }).unwrap()
+            if (rs.elements > 0) {
+                setFriendStatus("pending");
+                setProfile(prev => prev ? { ...prev, FO100S: myPost } : prev);
+            }
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const handleAcceptRequest = async () => {
+        try {
+            const rs = await callApiAccept({ FO100S: FO100, FO100R: myPost || 0 }).unwrap();
+            if (rs.elements > 0) {
+                setFriendStatus("accepted");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleCancelRequest = async () => {
+        try {
+            const rs = await callApiCancelRequest({ FO100S: myPost || 0, FO100R: FO100 }).unwrap();
+            if (rs.elements > 0) {
+                setFriendStatus("none");
+                setProfile(prev => prev ? { ...prev, FO100S: null } : prev);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleRejectRequest = async () => {
+        try {
+            const rs = await callApiRejectFriend({ FO100S: FO100, FO100R: myPost || 0 }).unwrap();
+            if (rs.elements > 0) {
+                setFriendStatus("none");
+                setProfile(prev => prev ? { ...prev, FO100S: null } : prev);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    return { profile, listPost, myPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike, handleSendRequest, handleAcceptRequest, friendStatus, handleCancelRequest, handleRejectRequest };
 }

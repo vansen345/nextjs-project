@@ -5,18 +5,32 @@ import { useProfileController } from "@/features/profile/profile_controller";
 import { getTimeText } from "@/lib/util";
 import { getDecryptedTitle } from "@/model/home_type";
 import { UserType } from "@/model/user_type";
-import { Avatar, Divider, Image, Masonry } from "antd";
+import { Avatar, Divider, Dropdown, Image, Masonry } from "antd";
+import { t } from "i18next";
 
-function ProfileScreen({ FO100, initialProfile }: { FO100: number, initialProfile: UserType | null }) {
+function ProfileScreen({
+  FO100,
+  initialProfile,
+}: {
+  FO100: number;
+  initialProfile: UserType | null;
+}) {
   const {
     profile,
+    myPost,
     listPost,
     isLoggedIn,
     bottomRef,
     handleItemClick,
     handleLike,
     dispatch,
-  } = useProfileController(FO100,initialProfile);
+    handleSendRequest,
+    handleAcceptRequest,
+    friendStatus,
+    handleCancelRequest,
+    handleRejectRequest,
+  } = useProfileController(FO100, initialProfile);
+
   return (
     <div className="w-full h-full">
       <div className="max-w-215 min-h-[calc(100vh-70px)] shadow-[0_0_7px_0_rgba(0,0,0,0.15)] px-2.5 pt-2.5 pb-1.25 bg-white mt-3 mx-auto rounded-[15px]">
@@ -48,10 +62,95 @@ function ProfileScreen({ FO100, initialProfile }: { FO100: number, initialProfil
                   </span>
                 </div>
               </div>
-              <div className="btn-edit-profile flex items-center bg-[#f4f4f4] p-3 gap-2.5 rounded-xl">
-                <i className="fpme-pen"></i>
-                <p className="text-[13px] font-semibold w-max">Chỉnh sửa</p>
-              </div>
+
+              {myPost && myPost === FO100 ? (
+                <div className="btn-edit-profile flex items-center bg-[#f4f4f4] p-3 gap-2.5 rounded-xl h-9">
+                  <i className="fpme-pen text-[12px]"></i>
+                  <p className="text-[13px] font-semibold w-max">Chỉnh sửa</p>
+                </div>
+              ) : myPost && myPost !== FO100 ? (
+                <div className="friend flex gap-2.5">
+                  <div className="btn-edit-profile flex items-center bg-[#f4f4f4] p-3 gap-2.5 rounded-xl h-9">
+                    <i className="fpme-plus text-[12px]"></i>
+                    <p className="text-[13px] font-semibold w-max">Theo dõi</p>
+                  </div>
+
+                  <Dropdown
+                    menu={{
+                      items:
+                        friendStatus !== "none"
+                          ? [
+                              {
+                                key: "1",
+                                label:
+                                  friendStatus === "pending" &&
+                                  profile?.FO100S === myPost
+                                    ? t("Huỷ lời mời kết bạn")
+                                    : friendStatus === "accepted"
+                                      ? "Huỷ kết bạn"
+                                      : "",
+                                onClick: () => {
+                                  if (
+                                    friendStatus === "pending" &&
+                                    profile?.FO100S === myPost
+                                  ) {
+                                    handleCancelRequest();
+                                  } else if (friendStatus === "accepted") {
+                                    handleCancelRequest();
+                                  }
+                                },
+                              },
+                            ]
+                          : [],
+                    }}
+                    trigger={["hover"]}
+                  >
+                    <div
+                      onClick={
+                        friendStatus === "none"
+                          ? handleSendRequest
+                          : friendStatus === "pending" &&
+                              profile?.FO100S !== myPost
+                            ? handleAcceptRequest
+                            : () => {}
+                      }
+                      className="cursor-pointer btn-edit-profile flex items-center bg-linear-to-r from-[#f3495b] to-[#f1874d] p-3 gap-2.5 rounded-xl text-white h-9"
+                    >
+                      <i
+                        className={`text-[12px] ${
+                          friendStatus === "none"
+                            ? "fpme-person"
+                            : friendStatus === "accepted"
+                              ? "fpme-friended"
+                              : friendStatus === "pending" &&
+                                  profile?.FO100S === myPost
+                                ? "fpme-sent-request"
+                                : "fpme-check"
+                        }`}
+                      ></i>
+                      <p className="text-[13px] font-semibold w-max">
+                        {friendStatus === "none"
+                          ? "Kết bạn"
+                          : friendStatus === "accepted"
+                            ? "Bạn bè"
+                            : friendStatus === "pending" &&
+                                profile?.FO100S === myPost
+                              ? "Đã gửi lời mời"
+                              : "Đồng ý"}
+                      </p>
+                    </div>
+                  </Dropdown>
+                  {friendStatus === "pending" && profile?.FO100S !== myPost && (
+                    <div
+                      onClick={handleRejectRequest}
+                      className="cursor-pointer btn-edit-profile flex items-center bg-[#f4f4f4] p-3 gap-2.5 rounded-xl h-9"
+                    >
+                      <i className="text-[12px] fpme-unfriend"></i>
+                      <p className="text-[13px] font-semibold w-max">Từ chối</p>
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -82,12 +181,6 @@ function ProfileScreen({ FO100, initialProfile }: { FO100: number, initialProfil
                         objectFit: "cover",
                       }}
                     />
-                    // <img
-                    //   src={data.PV307}
-                    //   alt=""
-                    //   loading="lazy"
-                    //   className="rounded-t-[10px]"
-                    // />
                   )}
                   {(data.PO322?.video?.length ?? 0) > 0 && (
                     <div className="">

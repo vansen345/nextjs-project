@@ -22,6 +22,10 @@ export const API_CONFIG = {
     GETPROFILE: "/profile/getInforUser",
     GETLISTPOST: "/profile/listPostByUser",
     DELETEPOST: "/home/deletePost",
-    UPDATEPOST: "/home/updatePostUser"
+    UPDATEPOST: "/home/updatePostUser",
+    SENDRQFRIEND: "/friend/send",
+    ACCEPTFRIEND: "/friend/accept",
+    CANCELREQUEST: "/friend/cancleRequets",
+    REJECTFRIEND: "/friend/rejectFriend",
   },
 };
