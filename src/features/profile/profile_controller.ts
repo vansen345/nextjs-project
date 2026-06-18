@@ -7,7 +7,7 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 import { useDispatch } from "react-redux";
 import slugify from "slugify";
 import { setIsModalOpen, setSelectedItem } from "../detail/detail_redux_slice";
-import { useAcceptFriendMutation, useCancelRequestMutation, useLazyGetListPostByUserQuery, useRejectFriendMutation, useSendRequestMutation } from "./profile_services";
+import { useAcceptFriendMutation, useCancelRequestMutation, useLazyGetListPostByUserQuery, useRejectFriendMutation, useSendRequestMutation, useUnfriendMutation } from "./profile_services";
 
 export const useProfileController = (FO100: number, initialProfile: UserType | null) => {
     const { likePost } = useSocket();
@@ -29,6 +29,7 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
     );
     const [callApiCancelRequest] = useCancelRequestMutation();
     const [callApiRejectFriend] = useRejectFriendMutation();
+    const [callApiUntFriend] = useUnfriendMutation();
 
     const fetchListPiepByUser = useCallback(async (newOffSet: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
@@ -164,6 +165,18 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
         }
     }
 
+    const handleUnfriend = async () => {
+        try {
+            const rs = await callApiUntFriend({ FO100S: myPost || 0, FO100R: FO100 }).unwrap();
+            if (rs.elements > 0) {
+                setFriendStatus("none");
+                setProfile(prev => prev ? { ...prev, FO100S: null } : prev);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
-    return { profile, listPost, myPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike, handleSendRequest, handleAcceptRequest, friendStatus, handleCancelRequest, handleRejectRequest };
+
+    return { profile, listPost, myPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike, handleSendRequest, handleAcceptRequest, friendStatus, handleCancelRequest, handleRejectRequest,handleUnfriend };
 }

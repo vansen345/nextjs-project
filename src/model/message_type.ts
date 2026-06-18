@@ -6,7 +6,7 @@
 
 export interface IMessage {
   _id?: string;
-  conversationId?:number;
+  conversationId?: number;
   roomId?: string;
   message?: string;
   senderId?: string;
@@ -15,7 +15,8 @@ export interface IMessage {
   receiverId?: string;
   receiverEmail?: string;
   receiverAvatar?: string;
-  senderName?:string;
-  receiverName?:string;
+  senderName?: string;
+  receiverName?: string;
   createdAt: string;
+  isRead?: boolean;
 }

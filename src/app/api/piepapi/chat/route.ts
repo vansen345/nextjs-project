@@ -9,11 +9,12 @@ export async function GET(request: NextRequest) {
     const conversationId = searchParams.get("conversationId");
     const limit = searchParams.get("limit");
     const offset = searchParams.get("offset");
+    const FO100 = searchParams.get("FO100");
     const token = request.headers.get("authorization") || "";
     const { data } = await callApi({
         endpoint: `${API_CONFIG.ENDPOINTS.GET_MESSAGES}/${conversationId}`,
         method: "GET",
-        query:{limit,offset},
+        query:{limit,offset,FO100},
         token,
     });
     return NextResponse.json(data);

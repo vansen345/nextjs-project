@@ -6,7 +6,7 @@ import { IMessage } from "@/model/message_type";
 import { ConversationType, UserType } from "@/model/user_type";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLazyGetListCoversationQuery, useLazyGetMessagesQuery, useSaveMessageMutation } from "./inbox.service";
+import { useCheckReadMessMutation, useLazyGetListCoversationQuery, useLazyGetMessagesQuery, useSaveMessageMutation } from "./inbox.service";
 
 export const useInboxController = (conversationId: number) => {
     const {
@@ -51,11 +51,18 @@ export const useInboxController = (conversationId: number) => {
     const chatListRef = useRef<HTMLDivElement>(null);
     const selectedUserRef = useRef<UserType | null>(null);
 
+    const [checkIsReadMess] = useCheckReadMessMutation();
+
     useEffect(() => {
         if (isConnected && userId) {
             joinRoom(userId);
         }
     }, [isConnected, userId]);
+
+    useEffect(() => {
+        if (!selectedConversationId || !FO100) return;
+        checkIsReadMess({ conversationId: selectedConversationId, FO100 });
+    }, [selectedConversationId]);
 
     const fetchDetailConversation = useCallback(async (newOffset: number, isInitial = false) => {
 
@@ -70,6 +77,7 @@ export const useInboxController = (conversationId: number) => {
             conversationId: selectedConversationId,
             limit: LIMIT,
             offset: newOffset,
+            FO100: FO100 || 0
         })
         if (data?.elements) {
             const newItems = data.elements;

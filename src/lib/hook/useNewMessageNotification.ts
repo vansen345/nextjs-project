@@ -46,7 +46,7 @@ export const useNewMessageNotification = () => {
     }, []);
 
     useEffect(() => {
-        if (pathname.startsWith("/chat")) {
+        if (pathname.startsWith("/inbox")) {
             stopBlinking();
         }
     }, [pathname]);

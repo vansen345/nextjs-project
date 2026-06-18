@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   const { data } = await callApi({
     endpoint: API_CONFIG.ENDPOINTS.LIST_CHAT,
-    query: { limit, offset,FO100 },
+    query: { limit, offset, FO100 },
     token,
     headers: {
       "x-user-email": userEmail

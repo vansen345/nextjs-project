@@ -9,12 +9,11 @@ export const inboxApi = createApi({
     baseQuery,
     tagTypes: ["Inbox"],
     endpoints: (builder) => ({
-
-        getMessages: builder.query<BaseResponse<IMessage[]>, { conversationId: number,limit:number,offset:number }>({
+        getMessages: builder.query<BaseResponse<IMessage[]>, { conversationId: number, limit: number, offset: number, FO100: number }>({
             query: (params) => ({
                 url: `/chat?conversationId=${params.conversationId}`,
                 method: "GET",
-                params:{limit:params.limit,offset:params.offset}
+                params: { limit: params.limit, offset: params.offset, FO100: params.FO100 }
             }),
             // providesTags: ["Chat"],
         }),
@@ -26,8 +25,7 @@ export const inboxApi = createApi({
             }),
             invalidatesTags: ["Inbox"],
         }),
-
-        getListCoversation: builder.query<BaseResponse<ConversationType[]>, { limit: number; offset: number, email: string,FO100:number }>({
+        getListCoversation: builder.query<BaseResponse<ConversationType[]>, { limit: number; offset: number, email: string, FO100: number }>({
             query: (params) => ({
                 url: `/chat/listConversation?limit=${params.limit}&offset=${params.offset}&FO100=${params.FO100}`,
                 method: "GET",
@@ -37,6 +35,13 @@ export const inboxApi = createApi({
             }),
             // providesTags: ["Chat"],
         }),
+        checkReadMess: builder.mutation<BaseResponse<number>, { conversationId: number, FO100: number }>({
+            query: ({ conversationId, FO100 }) => ({
+                url: "chat/check_read_mess",
+                method: "POST",
+                body: { conversationId, FO100 }
+            })
+        })
 
     })
 });
@@ -46,4 +51,5 @@ export const {
     useSaveMessageMutation,
     useGetListCoversationQuery,
     useLazyGetListCoversationQuery,
+    useCheckReadMessMutation
 } = inboxApi;

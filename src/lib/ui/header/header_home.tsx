@@ -10,7 +10,7 @@ import {
   Tooltip,
   type ConfigProviderProps,
 } from "antd";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { useHeaderController } from "@/features/header/header_controller";
@@ -19,6 +19,7 @@ import i18n from "@/i18n";
 import { setHasNewMessage } from "@/lib/hook/notificationMessage";
 import { useAuth } from "@/lib/hook/useAuth";
 import { UserOutlined } from "@ant-design/icons";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import CreatePiepScreen from "../create_piep/create_piep";
 import LoginScreen from "../login/login_screen";
@@ -28,7 +29,6 @@ import "./header_style.css";
 type SizeType = ConfigProviderProps["componentSize"];
 
 function Header() {
-  
   const { t } = useTranslation(undefined, { i18n });
   const currentLang = i18n.language;
   const [size] = useState<SizeType>("large");
@@ -51,6 +51,8 @@ function Header() {
   const { FO100 } = useAuth();
   const router = useRouter();
   const [fetchHome] = useLazyGetHomeListQuery();
+  const pathname = usePathname();
+  const profilePath = `/profile/${FO100}`;
 
   useEffect(() => {
     document.body.classList.add("hydrated");
@@ -146,7 +148,7 @@ function Header() {
                     icon={<span className="fpme-piep-and-call"></span>}
                     onClick={() => {
                       dispatch(setHasNewMessage(false));
-                      handleClick("/inbox");
+                      router.push('/inbox');
                     }}
                     className={`button-chat hidden md:flex ${getColor2("chat")}`}
                   />
@@ -170,10 +172,20 @@ function Header() {
                   items: [
                     {
                       key: "1",
-                      label: isLoggedIn ? t("text_profile") : t("register"),
-                      onClick: isLoggedIn
-                        ? () => router.push(`/profile/${FO100}`)
-                        : onOpenRegister,
+                      label: isLoggedIn ? (
+                        <Link
+                          href={`/profile/${FO100}`}
+                          prefetch={false}
+                          onClick={(e) => {
+                            if (pathname === profilePath) e.preventDefault();
+                          }}
+                        >
+                          {t("text_profile")}
+                        </Link>
+                      ) : (
+                        t("register")
+                      ),
+                      onClick: !isLoggedIn ? onOpenRegister : undefined,
                     },
                     {
                       key: "2",

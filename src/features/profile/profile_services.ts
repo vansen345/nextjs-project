@@ -50,6 +50,13 @@ export const profileApi = createApi({
                 body: { FO100S, FO100R }
             })
         }),
+        unfriend: builder.mutation<BaseResponseObject<number>, { FO100S: number, FO100R: number }>({
+            query: ({ FO100S, FO100R }) => ({
+                url: 'friend/unfriend',
+                method: "POST",
+                body: { FO100S, FO100R }
+            })
+        })
     })
 })
 
@@ -60,5 +67,6 @@ export const {
     useAcceptFriendMutation,
     useSendRequestMutation,
     useCancelRequestMutation,
-    useRejectFriendMutation
+    useRejectFriendMutation,
+    useUnfriendMutation
 } = profileApi

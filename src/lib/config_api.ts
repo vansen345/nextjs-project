@@ -14,6 +14,7 @@ export const API_CONFIG = {
     GET_MESSAGES: "/message/list",
     LIST_CHAT: "/message/listUserChat",
     GET_OR_CREATE_ROOM: "/message/room",
+    CHECK_READ_MESS: "/message/checkReadMess",
     POST_CREATE: "/home/createPost",
     UPLOAD_IMG: "/home/uploadImg",
     INSERTCOMMENT: "/comment/insertComment",
@@ -27,5 +28,6 @@ export const API_CONFIG = {
     ACCEPTFRIEND: "/friend/accept",
     CANCELREQUEST: "/friend/cancleRequets",
     REJECTFRIEND: "/friend/rejectFriend",
+    UNFRIEND: "/friend/unfriend",
   },
 };

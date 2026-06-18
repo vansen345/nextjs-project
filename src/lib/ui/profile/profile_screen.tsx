@@ -29,6 +29,7 @@ function ProfileScreen({
     friendStatus,
     handleCancelRequest,
     handleRejectRequest,
+    handleUnfriend,
   } = useProfileController(FO100, initialProfile);
 
   return (
@@ -96,14 +97,15 @@ function ProfileScreen({
                                   ) {
                                     handleCancelRequest();
                                   } else if (friendStatus === "accepted") {
-                                    handleCancelRequest();
+                                    handleUnfriend();
                                   }
                                 },
                               },
                             ]
                           : [],
                     }}
-                    trigger={["hover"]}
+                    trigger={["click"]}
+                    disabled={friendStatus === "none" || (friendStatus === "pending" && profile?.FO100S !== myPost)}
                   >
                     <div
                       onClick={
