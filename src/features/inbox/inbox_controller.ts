@@ -59,10 +59,10 @@ export const useInboxController = (conversationId: number) => {
         }
     }, [isConnected, userId]);
 
-    useEffect(() => {
-        if (!selectedConversationId || !FO100) return;
-        checkIsReadMess({ conversationId: selectedConversationId, FO100 });
-    }, [selectedConversationId]);
+    // useEffect(() => {
+    //     if (!selectedConversationId || !FO100) return;
+    //     checkIsReadMess({ conversationId: selectedConversationId, FO100 });
+    // }, [selectedConversationId]);
 
     const fetchDetailConversation = useCallback(async (newOffset: number, isInitial = false) => {
 
