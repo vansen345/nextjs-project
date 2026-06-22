@@ -4,6 +4,8 @@
 //   sender: string;
 // }
 
+import { ContentImg } from "./upload_media";
+
 export interface IMessage {
   _id?: string;
   conversationId?: number;
@@ -19,4 +21,8 @@ export interface IMessage {
   receiverName?: string;
   createdAt: string;
   isRead?: boolean;
+  type?: "text" | "sticker" | "image";
+  media?: {
+    image: ContentImg[];
+  }
 }

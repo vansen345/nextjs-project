@@ -3,10 +3,13 @@ import { useAuth } from "@/lib/hook/useAuth";
 import { useSocket } from "@/lib/hook/useSocket";
 import { getDateName } from "@/lib/util";
 import { IMessage } from "@/model/message_type";
+import { ContentImg } from "@/model/upload_media";
 import { ConversationType, UserType } from "@/model/user_type";
+import imageCompression from "browser-image-compression";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useCheckReadMessMutation, useLazyGetListCoversationQuery, useLazyGetMessagesQuery, useSaveMessageMutation } from "./inbox.service";
+import { useUploadImgVideoMutation } from "../create_piep/create_piep_services";
+import { useLazyGetListCoversationQuery, useLazyGetMessagesQuery, useSaveMessageMutation } from "./inbox.service";
 
 export const useInboxController = (conversationId: number) => {
     const {
@@ -51,7 +54,14 @@ export const useInboxController = (conversationId: number) => {
     const chatListRef = useRef<HTMLDivElement>(null);
     const selectedUserRef = useRef<UserType | null>(null);
 
-    const [checkIsReadMess] = useCheckReadMessMutation();
+    const [images, setImages] = useState<ContentImg[]>([]);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [uploadMedia] = useUploadImgVideoMutation();
+
+
+
+
+    // const [checkIsReadMess] = useCheckReadMessMutation();
 
     useEffect(() => {
         if (isConnected && userId) {
@@ -59,18 +69,29 @@ export const useInboxController = (conversationId: number) => {
         }
     }, [isConnected, userId]);
 
-    // useEffect(() => {
-    //     if (!selectedConversationId || !FO100) return;
-    //     checkIsReadMess({ conversationId: selectedConversationId, FO100 });
-    // }, [selectedConversationId]);
+    useEffect(() => {
+        if (!selectedConversationId || !listConversation.length) return;
+        const found = listConversation.find(c => c.conversationId === selectedConversationId);
+        if (found) {
+            document.title = `Tin nhắn: ${found.NV106}`;
+        }
+
+    }, [selectedConversationId, listConversation]);
+
+
 
     const fetchDetailConversation = useCallback(async (newOffset: number, isInitial = false) => {
-
         if (!selectedConversationId || isLoadingRefDetailList.current || (!isInitial && !hasMoreRefDetail.current)) return;
         isLoadingRefDetailList.current = true;
 
         if (isInitial) {
             setHistoryMessages([]);
+            // update isUnread = false ngay khi click vào conversation
+            setListConversation(prev => prev.map(c =>
+                c.conversationId === selectedConversationId
+                    ? { ...c, isUnread: false }
+                    : c
+            ));
         }
 
         const { data } = await triggerDetailConversation({
@@ -78,7 +99,8 @@ export const useInboxController = (conversationId: number) => {
             limit: LIMIT,
             offset: newOffset,
             FO100: FO100 || 0
-        })
+        });
+
         if (data?.elements) {
             const newItems = data.elements;
             setHistoryMessages(prev => isInitial ? newItems : [...newItems, ...prev]);
@@ -205,7 +227,12 @@ export const useInboxController = (conversationId: number) => {
             setListConversation((prev) =>
                 prev.map((conversation) =>
                     conversation.conversationId === data.conversationId
-                        ? { ...conversation, lastMessage: data.message || "", lastMessageAt: data.createdAt }
+                        ? {
+                            ...conversation,
+                            lastMessage: data.message || "",
+                            lastMessageAt: data.createdAt,
+                            isUnread: data.conversationId !== selectedConversationId
+                        }
                         : conversation
                 )
             );
@@ -219,28 +246,131 @@ export const useInboxController = (conversationId: number) => {
         return () => { cleanup?.(); };
     }, [selectedConversationId, onReceiveMessage]);
 
-    const handleSend = async () => {
-        if (!inputMessage.trim()) return;
+    const handleOpenMedia = () => {
+        setTimeout(() => {
+            inputRef.current?.click();
+        }, 200);
+    };
+
+    const handleMediaChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        const formData = new FormData();
+
+        await Promise.all(
+            files.map(async (file) => {
+                if (file.type.startsWith('image/')) {
+                    const compressed = await imageCompression(file, {
+                        maxSizeMB: 1,
+                        maxWidthOrHeight: 1280,
+                    });
+                    formData.append('media', compressed, compressed.name);
+                } else {
+                    formData.append('media', file, file.name);
+                }
+            })
+        );
+
+        // thêm preview tạm
+        const tempMedia = files.map((file, index) => ({
+            FM600: 0,
+            index: images.length + index + 1,
+            IMG: URL.createObjectURL(file),
+            RATIO: 1,
+            THUMB: URL.createObjectURL(file),
+            DES: "",
+            loading: true,
+            progress: 0,
+            type: file.type.startsWith('video/') ? 'video' : 'image',
+        }));
+        setImages((prev) => [...prev, ...tempMedia]);
+
+        const startIndex = images.length;
+        const progressInterval = setInterval(() => {
+            setImages((prev) => prev.map((img, i) => {
+                if (i >= startIndex && img.loading && (img.progress || 0) < 90) {
+                    return { ...img, progress: (img.progress || 0) + 10 };
+                }
+                return img;
+            }));
+        }, 200);
+
+        try {
+            const result = await uploadMedia(formData).unwrap();
+            clearInterval(progressInterval);
+            setImages((prev) => {
+                const newImages = [...prev];
+                result.elements.forEach((img, i) => {
+                    newImages[startIndex + i] = { ...img, loading: false, progress: 100 };
+                });
+                return newImages;
+            });
+            if (inputRef.current) inputRef.current.value = '';
+        } catch (error) {
+            clearInterval(progressInterval);
+            console.log(error);
+        }
+    };
+
+    const removeImage = (index: number) => {
+        setImages((prev) => prev.filter((_, i) => i !== index));
+    };
+
+
+    const handleSend = async (type: "text" | "sticker" | "image" = "text") => {
+        if (type === "text" && !inputMessage.trim() && images.length === 0) return;
         if (!selectedUserRef.current) return;
 
         try {
-            await saveMessage({
-                conversationId: selectedConversationId || 0,
-                message: inputMessage,
-                senderId: userId || "",
-                senderEmail: userEmail || "",
-                senderAvatar: NV126 || "",
-                receiverId: selectedUserRef.current._id,
-                receiverAvatar: selectedUserRef.current.NV126,
-                senderName: NV106 || "",
-                receiverName: selectedUserRef.current.NV106 || ''
-            }).unwrap();
-            setInputMessage("");
+            // nếu có hình thì gửi hình trước
+            if (images.length > 0) {
+                await saveMessage({
+                    conversationId: selectedConversationId || 0,
+                    message: "",
+                    senderId: userId || "",
+                    senderEmail: userEmail || "",
+                    senderAvatar: NV126 || "",
+                    receiverId: selectedUserRef.current._id,
+                    receiverAvatar: selectedUserRef.current.NV126,
+                    senderName: NV106 || "",
+                    receiverName: selectedUserRef.current.NV106 || '',
+                    type: "image",
+                    media: {
+                        image: images.map((img) => ({
+                            FM600: img.FM600,
+                            index: img.index,
+                            DES: img.DES,
+                            IMG: img.IMG,
+                            RATIO: img.RATIO,
+                            THUMB: img.THUMB,
+                        }))
+                    }
+                }).unwrap();
+                setImages([]);
+            }
+
+            // nếu có text thì gửi text
+            if (inputMessage.trim()) {
+                await saveMessage({
+                    conversationId: selectedConversationId || 0,
+                    message: inputMessage,
+                    senderId: userId || "",
+                    senderEmail: userEmail || "",
+                    senderAvatar: NV126 || "",
+                    receiverId: selectedUserRef.current._id,
+                    receiverAvatar: selectedUserRef.current.NV126,
+                    senderName: NV106 || "",
+                    receiverName: selectedUserRef.current.NV106 || '',
+                    type: "text",
+                }).unwrap();
+                setInputMessage("");
+            }
+
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
         } catch (error) {
             console.log(error);
         }
     };
+
     return {
         listConversation, isFetching, hasMore, listRef,
         inputMessage,
@@ -254,7 +384,12 @@ export const useInboxController = (conversationId: number) => {
         selectedUserRef,
         // selectedUserId,
         // setSelectedUserId,
-        selectedConversationId
+        selectedConversationId,
+        handleOpenMedia,
+        handleMediaChange,
+        removeImage,
+        inputRef,
+        images
     };
 
 }

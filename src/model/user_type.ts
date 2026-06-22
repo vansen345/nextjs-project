@@ -14,4 +14,5 @@ export type ConversationType = UserType & {
     conversationId: number | null;
     lastMessage: string;
     lastMessageAt: string | null;
+    isUnread?: boolean;
 }

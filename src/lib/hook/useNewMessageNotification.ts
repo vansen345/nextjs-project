@@ -64,7 +64,7 @@ export const useNewMessageNotification = () => {
                 }
             );
             if (data.senderId === userId) return;
-            if (!pathname.startsWith("/chat")) {
+            if (!pathname.startsWith("/inbox")) {
                 dispatch(setHasNewMessage(true)) ;
                 startBlinking(data.senderName || 'Tin nhắn mới');
             }
