@@ -65,6 +65,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
     removeImage,
     images,
     inputRef,
+    userId,
   } = useInboxController(conversationId);
 
   return (
@@ -132,7 +133,11 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                       {conversation.NV106}
                     </p>
                     <p className="text-[12px] overflow-hidden text-ellipsis whitespace-nowrap text-[#888] font-semibold">
-                      {conversation.lastMessage}
+                      {conversation.lastMessageType === "image"
+                        ? conversation.lastMessageSenderId === userId
+                          ? "Bạn đã gửi hình ảnh"
+                          : `${conversation.lastMessageSenderName} đã gửi hình ảnh`
+                        : `${conversation.lastMessageSenderName}: ${conversation.lastMessage}`}
                     </p>
                   </div>
                 </div>
@@ -175,23 +180,25 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                           {formatDateWithType(msg.createdAt, "hh:mm")}
                         </p>
                         {msg.media?.image?.length === 1 ? (
-                          <Image
-                            src={
-                              msg.media.image[0].THUMB ||
-                              msg.media.image[0].IMG ||
-                              ""
-                            }
-                            alt=""
-                            loading="lazy"
-                            preview={false}
-                            className="rounded-lg"
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                              borderRadius: "10px",
-                            }}
-                          />
+                          <div className="one-img max-w-96.25">
+                            <Image
+                              src={
+                                msg.media.image[0].THUMB ||
+                                msg.media.image[0].IMG ||
+                                ""
+                              }
+                              alt=""
+                              loading="lazy"
+                              preview={false}
+                              className="rounded-lg"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                borderRadius: "10px",
+                              }}
+                            />
+                          </div>
                         ) : (
                           <div
                             style={{

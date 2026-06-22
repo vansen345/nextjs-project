@@ -58,9 +58,6 @@ export const useInboxController = (conversationId: number) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [uploadMedia] = useUploadImgVideoMutation();
 
-
-
-
     // const [checkIsReadMess] = useCheckReadMessMutation();
 
     useEffect(() => {
@@ -77,7 +74,6 @@ export const useInboxController = (conversationId: number) => {
         }
 
     }, [selectedConversationId, listConversation]);
-
 
 
     const fetchDetailConversation = useCallback(async (newOffset: number, isInitial = false) => {
@@ -109,6 +105,8 @@ export const useInboxController = (conversationId: number) => {
         }
         isLoadingRefDetailList.current = false;
     }, [triggerDetailConversation, selectedConversationId]);
+
+
 
     const allMessages = useMemo(() => {
         const map = new Map<string, IMessage>();
@@ -224,14 +222,19 @@ export const useInboxController = (conversationId: number) => {
     useEffect(() => {
         const cleanup = onReceiveMessage((data) => {
             console.log("📩 receive:", data);
+
+            // real time tin nhắn mới nhất
             setListConversation((prev) =>
                 prev.map((conversation) =>
                     conversation.conversationId === data.conversationId
                         ? {
                             ...conversation,
                             lastMessage: data.message || "",
+                            lastMessageType: data.type || "text",
+                            lastMessageSenderId: data.senderId || "",
+                            lastMessageSenderName: data.senderName || "",
                             lastMessageAt: data.createdAt,
-                            isUnread: data.conversationId !== selectedConversationId
+                            isUnread: data.conversationId !== selectedConversationId,
                         }
                         : conversation
                 )
@@ -245,6 +248,8 @@ export const useInboxController = (conversationId: number) => {
         });
         return () => { cleanup?.(); };
     }, [selectedConversationId, onReceiveMessage]);
+
+
 
     const handleOpenMedia = () => {
         setTimeout(() => {
@@ -389,7 +394,8 @@ export const useInboxController = (conversationId: number) => {
         handleMediaChange,
         removeImage,
         inputRef,
-        images
+        images,
+        userId
     };
 
 }

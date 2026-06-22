@@ -95,7 +95,7 @@ function Header() {
           <div className="logo-search">
             <span className="shrink-0">
               <Image
-                src="https://res.cloudinary.com/dcu47l2uc/image/upload/v1776244870/logo-piepme-header_wiho0z.png"
+                src="https://res.cloudinary.com/dcu47l2uc/image/upload/v1782116103/logo-piepme-header_tkj0kp.png"
                 alt="Logo"
                 height={22}
                 preview={false}

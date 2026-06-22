@@ -11,8 +11,17 @@ export interface UserType {
 }
 
 export type ConversationType = UserType & {
+    // conversationId: number | null;
+    // lastMessage: string;
+    // lastMessageType?: "text" | "sticker" | "image",
+    // lastMessageAt: string | null;
+    // isUnread?: boolean;
+
     conversationId: number | null;
     lastMessage: string;
     lastMessageAt: string | null;
     isUnread?: boolean;
+    lastMessageType?: "text" | "sticker" | "image",
+    lastMessageSenderId?: string;
+    lastMessageSenderName?: string;
 }
