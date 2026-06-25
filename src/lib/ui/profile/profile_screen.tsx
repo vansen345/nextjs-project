@@ -7,6 +7,7 @@ import { getDecryptedTitle } from "@/model/home_type";
 import { UserType } from "@/model/user_type";
 import { Avatar, Divider, Dropdown, Image, Masonry } from "antd";
 import { t } from "i18next";
+import EditProfileScreen from "./edit_profile_screen";
 
 function ProfileScreen({
   FO100,
@@ -30,6 +31,9 @@ function ProfileScreen({
     handleCancelRequest,
     handleRejectRequest,
     handleUnfriend,
+    onOpenEdit,
+    isModalOpenEdit,
+    setProfile
   } = useProfileController(FO100, initialProfile);
 
   return (
@@ -65,7 +69,10 @@ function ProfileScreen({
               </div>
 
               {myPost && myPost === FO100 ? (
-                <div className="btn-edit-profile flex items-center bg-[#f4f4f4] p-3 gap-2.5 rounded-xl h-9">
+                <div
+                  onClick={onOpenEdit}
+                  className="btn-edit-profile flex items-center bg-[#f4f4f4] p-3 gap-2.5 rounded-xl h-9 cursor-pointer"
+                >
                   <i className="fpme-pen text-[12px]"></i>
                   <p className="text-[13px] font-semibold w-max">Chỉnh sửa</p>
                 </div>
@@ -105,7 +112,10 @@ function ProfileScreen({
                           : [],
                     }}
                     trigger={["click"]}
-                    disabled={friendStatus === "none" || (friendStatus === "pending" && profile?.FO100S !== myPost)}
+                    disabled={
+                      friendStatus === "none" ||
+                      (friendStatus === "pending" && profile?.FO100S !== myPost)
+                    }
                   >
                     <div
                       onClick={
@@ -270,6 +280,13 @@ function ProfileScreen({
           <div ref={bottomRef} style={{ height: 20 }} />
         </div>
       </div>
+      {isModalOpenEdit && (
+        <EditProfileScreen
+          initialProfile={initialProfile}
+          FO100={FO100}
+          onUpdateProfile={(newProfile) => setProfile(newProfile)}
+        />
+      )}
     </div>
   );
 }

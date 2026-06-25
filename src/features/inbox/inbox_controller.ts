@@ -222,8 +222,6 @@ export const useInboxController = (conversationId: number) => {
     useEffect(() => {
         const cleanup = onReceiveMessage((data) => {
             console.log("📩 receive:", data);
-
-            // real time tin nhắn mới nhất
             setListConversation((prev) =>
                 prev.map((conversation) =>
                     conversation.conversationId === data.conversationId

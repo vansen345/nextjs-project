@@ -3,13 +3,18 @@ import { useSocket } from "@/lib/hook/useSocket";
 import NProgress from "@/lib/nprogress";
 import { getDecryptedTitle, HomeItem } from "@/model/home_type";
 import { UserType } from "@/model/user_type";
+import { RootState } from "@/store";
+import imageCompression from "browser-image-compression";
+import { useSession } from "next-auth/react";
 import { startTransition, useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import slugify from "slugify";
+import { useUploadImgVideoMutation } from "../create_piep/create_piep_services";
 import { setIsModalOpen, setSelectedItem } from "../detail/detail_redux_slice";
-import { useAcceptFriendMutation, useCancelRequestMutation, useLazyGetListPostByUserQuery, useRejectFriendMutation, useSendRequestMutation, useUnfriendMutation } from "./profile_services";
+import { setIsModalEditProfile } from "./profile_redux";
+import { useAcceptFriendMutation, useCancelRequestMutation, useEditProfileMutation, useLazyGetListPostByUserQuery, useRejectFriendMutation, useSendRequestMutation, useUnfriendMutation } from "./profile_services";
 
-export const useProfileController = (FO100: number, initialProfile: UserType | null) => {
+export const useProfileController = (FO100: number, initialProfile: UserType | null, onUpdateProfile?: (newProfile: UserType) => void) => {
     const { likePost } = useSocket();
     const { isLoggedIn, FO100: myPost } = useAuth();
     const [profile, setProfile] = useState<UserType | null>(initialProfile);
@@ -30,6 +35,16 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
     const [callApiCancelRequest] = useCancelRequestMutation();
     const [callApiRejectFriend] = useRejectFriendMutation();
     const [callApiUntFriend] = useUnfriendMutation();
+    const [callApiEditProfile] = useEditProfileMutation();
+    const isModalOpenEdit = useSelector(
+        (state: RootState) => state.profile.isModalEditProfile,
+    );
+
+    const [valueName, setValueName] = useState("");
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [avatarUrl, setAvatarUrl] = useState(profile?.NV126 ?? '');
+    const [uploadMedia] = useUploadImgVideoMutation();
+    const { update } = useSession();
 
     const fetchListPiepByUser = useCallback(async (newOffSet: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
@@ -42,7 +57,7 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
                 const newItems = data.elements ?? [];
                 const newHasMore = newItems.length === LIMIT;
 
-                setListPost(prev => isInitial ? newItems : [...newItems, ...prev]);
+                setListPost(prev => isInitial ? newItems : [...prev, ...newItems]);
                 offsetRef.current = newOffSet + LIMIT;
                 hasMoreRef.current = newHasMore;
             }
@@ -53,6 +68,7 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
             console.log(error);
         }
     }, [triggerListPost, FO100])
+
 
     useEffect(() => {
         if (!FO100) return;
@@ -177,6 +193,58 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
         }
     }
 
+    const onOpenEdit = () => dispatch(setIsModalEditProfile(true));
+    const onChangeName = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+        setValueName(value);
+    };
 
-    return { profile, listPost, myPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike, handleSendRequest, handleAcceptRequest, friendStatus, handleCancelRequest, handleRejectRequest,handleUnfriend };
+    const handleOpenMedia = () => {
+        setTimeout(() => {
+            inputRef.current?.click();
+        }, 200);
+    };
+
+    const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const formData = new FormData();
+        const compress = await imageCompression(file, {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1280,
+        })
+
+        formData.append('NV126', compress, compress.name);
+        try {
+            const rs = await uploadMedia(formData).unwrap();
+            setAvatarUrl(rs.elements[0].IMG || '');
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    const onEditProfile = async () => {
+        const rs = await callApiEditProfile({
+            FO100: FO100,
+            NV106: valueName || profile?.NV106 || '',
+            NV126: avatarUrl || profile?.NV126 || '',
+        }).unwrap();
+
+        if (rs.elements != null) {
+            await update({
+                NV106: valueName,
+                NV126: avatarUrl,
+            });
+            onUpdateProfile?.(rs.elements);
+            dispatch(setIsModalEditProfile(false))
+        }
+    }
+
+    const onCloseEdit = async () => {
+        dispatch(setIsModalEditProfile(false));
+    }
+
+
+
+    return { profile, listPost, myPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike, handleSendRequest, handleAcceptRequest, friendStatus, handleCancelRequest, handleRejectRequest, handleUnfriend, isModalOpenEdit, onOpenEdit, onChangeName, onEditProfile, setProfile, avatarUrl, handleChangeAvatar, handleOpenMedia, inputRef, onCloseEdit };
 }

@@ -22,6 +22,7 @@ export const API_CONFIG = {
     UPLOAD_MEDIA: "/media/uploadMedia",
     GETPROFILE: "/profile/getInforUser",
     GETLISTPOST: "/profile/listPostByUser",
+    EDITPROFILE: "/profile/editProfile",
     DELETEPOST: "/home/deletePost",
     UPDATEPOST: "/home/updatePostUser",
     SENDRQFRIEND: "/friend/send",

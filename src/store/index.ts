@@ -8,6 +8,7 @@ import { homeApi } from "@/features/home/home_api";
 import { inboxApi } from "@/features/inbox/inbox.service";
 import authReducer from "@/features/login/authen_slice";
 import { loginApi } from "@/features/login/login_services";
+import profileReducer from "@/features/profile/profile_redux";
 import { profileApi } from "@/features/profile/profile_services";
 import { registerApi } from "@/features/register/register_services";
 import notificationMessageSlice from "@/lib/hook/notificationMessage";
@@ -27,7 +28,8 @@ export const store = configureStore({
     header: headerReducer,
     auth: authReducer,
     createPiep: createReducer,
-    notificationMessage: notificationMessageSlice
+    notificationMessage: notificationMessageSlice,
+    profile:profileReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()

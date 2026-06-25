@@ -162,7 +162,7 @@ function Header() {
               <Button
                 shape="circle"
                 icon={<span className="fpme-ring"></span>}
-                onClick={() => handleClick("ring")}
+                onClick={()=>{}}
                 className={`button-notification hidden md:flex ${getColor2("ring")}`}
               />
             </Tooltip>
