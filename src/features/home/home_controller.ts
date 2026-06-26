@@ -41,18 +41,21 @@ export const useHomePageController = () => {
 
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
-        
+
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
 
         isLoadingRef.current = true;
         NProgress.start();
-       
+
         try {
             const { data } = await trigger({ limit: LIMIT, offset: newOffset, FO100: FO100 || 0 });
-           
+
             if (data) {
                 const newItems = data.elements ?? [];
-                const newHasMore = newItems.length === LIMIT;
+                const newHasMore = offsetRef.current + newItems.length < data.total;
+
+                console.log('newItems', newItems.length);
+
 
                 setList((prev) => {
                     const existingIds = new Set(prev.map(item => item._id));
@@ -91,12 +94,12 @@ export const useHomePageController = () => {
         }
     }, [likeUpate]);
 
-    useEffect(()=>{
-        if(commentUpdate){
+    useEffect(() => {
+        if (commentUpdate) {
             startTransition(() => {
-                setList((prevList)=>
-                    prevList.map((item)=>{
-                        if(item.PP300 === commentUpdate.PP300){
+                setList((prevList) =>
+                    prevList.map((item) => {
+                        if (item.PP300 === commentUpdate.PP300) {
                             return {
                                 ...item,
                                 TOTALCOMMENTS: commentUpdate.TOTALCOMMENTS,
@@ -127,6 +130,7 @@ export const useHomePageController = () => {
 
     useEffect(() => {
         const handleScroll = () => {
+            console.log('scroll', hasMoreRef.current, isLoadingRef.current);
             if (
                 window.innerHeight + window.scrollY >=
                 document.documentElement.scrollHeight - 50
@@ -139,7 +143,7 @@ export const useHomePageController = () => {
 
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [fetchList]);
+    }, []);
 
 
     const handleItemClick = (item: HomeItem) => {

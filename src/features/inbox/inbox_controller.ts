@@ -57,6 +57,7 @@ export const useInboxController = (conversationId: number) => {
     const [images, setImages] = useState<ContentImg[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const [uploadMedia] = useUploadImgVideoMutation();
+    const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
 
     // const [checkIsReadMess] = useCheckReadMessMutation();
 
@@ -272,6 +273,7 @@ export const useInboxController = (conversationId: number) => {
                 }
             })
         );
+        formData.append('folder', 'messages');
 
         // thêm preview tạm
         const tempMedia = files.map((file, index) => ({
@@ -319,61 +321,70 @@ export const useInboxController = (conversationId: number) => {
     };
 
 
-    const handleSend = async (type: "text" | "sticker" | "image" = "text") => {
-        if (type === "text" && !inputMessage.trim() && images.length === 0) return;
-        if (!selectedUserRef.current) return;
+   const handleSend = async (type: "text" | "sticker" | "image" = "text") => {
+    if (type === "text" && !inputMessage.trim() && images.length === 0) return;
+    if (!selectedUserRef.current) return;
 
-        try {
-            // nếu có hình thì gửi hình trước
-            if (images.length > 0) {
-                await saveMessage({
-                    conversationId: selectedConversationId || 0,
-                    message: "",
-                    senderId: userId || "",
-                    senderEmail: userEmail || "",
-                    senderAvatar: NV126 || "",
-                    receiverId: selectedUserRef.current._id,
-                    receiverAvatar: selectedUserRef.current.NV126,
-                    senderName: NV106 || "",
-                    receiverName: selectedUserRef.current.NV106 || '',
-                    type: "image",
-                    media: {
-                        image: images.map((img) => ({
-                            FM600: img.FM600,
-                            index: img.index,
-                            DES: img.DES,
-                            IMG: img.IMG,
-                            RATIO: img.RATIO,
-                            THUMB: img.THUMB,
-                        }))
-                    }
-                }).unwrap();
-                setImages([]);
-            }
+    const replyTo = replyMessage ? {
+        _id: replyMessage._id,
+        message: replyMessage.message,
+        senderName: replyMessage.senderName,
+        type: replyMessage.type,
+        media: replyMessage.media
+    } : undefined;
 
-            // nếu có text thì gửi text
-            if (inputMessage.trim()) {
-                await saveMessage({
-                    conversationId: selectedConversationId || 0,
-                    message: inputMessage,
-                    senderId: userId || "",
-                    senderEmail: userEmail || "",
-                    senderAvatar: NV126 || "",
-                    receiverId: selectedUserRef.current._id,
-                    receiverAvatar: selectedUserRef.current.NV126,
-                    senderName: NV106 || "",
-                    receiverName: selectedUserRef.current.NV106 || '',
-                    type: "text",
-                }).unwrap();
-                setInputMessage("");
-            }
-
-            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-        } catch (error) {
-            console.log(error);
+    try {
+        if (images.length > 0) {
+            await saveMessage({
+                conversationId: selectedConversationId || 0,
+                message: "",
+                senderId: userId || "",
+                senderEmail: userEmail || "",
+                senderAvatar: NV126 || "",
+                receiverId: selectedUserRef.current._id,
+                receiverAvatar: selectedUserRef.current.NV126,
+                senderName: NV106 || "",
+                receiverName: selectedUserRef.current.NV106 || '',
+                type: "image",
+                media: {
+                    image: images.map((img) => ({
+                        FM600: img.FM600,
+                        index: img.index,
+                        DES: img.DES,
+                        IMG: img.IMG,
+                        RATIO: img.RATIO,
+                        THUMB: img.THUMB,
+                    }))
+                },
+                ...(replyTo && { replyTo }),
+            }).unwrap();
+            setImages([]);
+            setReplyMessage(null);
         }
-    };
 
+        if (inputMessage.trim()) {
+            await saveMessage({
+                conversationId: selectedConversationId || 0,
+                message: inputMessage,
+                senderId: userId || "",
+                senderEmail: userEmail || "",
+                senderAvatar: NV126 || "",
+                receiverId: selectedUserRef.current._id,
+                receiverAvatar: selectedUserRef.current.NV126,
+                senderName: NV106 || "",
+                receiverName: selectedUserRef.current.NV106 || '',
+                type: "text",
+                ...(replyTo && { replyTo }),
+            }).unwrap();
+            setInputMessage("");
+            setReplyMessage(null);
+        }
+
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    } catch (error) {
+        console.log(error);
+    }
+};
     return {
         listConversation, isFetching, hasMore, listRef,
         inputMessage,
@@ -393,7 +404,8 @@ export const useInboxController = (conversationId: number) => {
         removeImage,
         inputRef,
         images,
-        userId
+        userId,
+        replyMessage, setReplyMessage
     };
 
 }

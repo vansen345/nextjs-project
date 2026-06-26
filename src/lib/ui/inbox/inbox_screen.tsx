@@ -2,7 +2,8 @@
 
 import { useInboxController } from "@/features/inbox/inbox_controller";
 import { formatDateWithType } from "@/lib/util";
-import { Avatar, Image, Input, Popover } from "antd";
+import { Avatar, Dropdown, Image, Input, Popover } from "antd";
+import clsx from "clsx";
 import EmojiPicker from "emoji-picker-react";
 import { useRouter } from "next/navigation";
 import "swiper/css";
@@ -66,6 +67,8 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
     images,
     inputRef,
     userId,
+    replyMessage,
+    setReplyMessage,
   } = useInboxController(conversationId);
 
   return (
@@ -165,10 +168,16 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                   </div>
                 )}
                 <div
-                  className={`flex mb-3 ${isMyMessage ? "justify-end" : "justify-start"}`}
+                  className={clsx(
+                    "flex mb-3 group",
+                    isMyMessage
+                      ? "flex-row-reverse items-center"
+                      : "items-center",
+                  )}
                 >
+                  {" "}
                   <div
-                    className={`px-4 py-2 rounded-2xl wrap-break-word inline-flex items-baseline font-medium ${
+                    className={`p-3.5 rounded-2xl wrap-break-word inline-flex items-baseline font-medium ${
                       isMyMessage
                         ? "bg-[#fff0f2] text-black rounded-br-sm"
                         : "bg-gray-100 text-black rounded-bl-sm"
@@ -210,7 +219,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                             {msg.media?.image?.map((img, index) => (
                               <div
                                 key={index}
-                                className="w-30 h-30 overflow-hidden rounded-lg shrink-0"
+                                className="overflow-hidden rounded-lg shrink-0"
                               >
                                 <Image
                                   src={img.THUMB || img.IMG || ""}
@@ -219,9 +228,10 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                                   preview={false}
                                   className="rounded-lg"
                                   style={{
-                                    width: "100%",
-                                    height: "100%",
+                                    width: "120px",
+                                    height: "120px",
                                     objectFit: "cover",
+                                    display: "block",
                                   }}
                                 />
                               </div>
@@ -231,12 +241,85 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                       </div>
                     ) : (
                       <>
-                        <p>{msg.message}</p>
-                        <p className="text-[12px] font-medium text-[#686868] pl-1.5">
-                          {formatDateWithType(msg.createdAt, "hh:mm")}
-                        </p>
+                        {/* #fff8f9  ME */}
+                        <div className="text-mess">
+                          {msg.replyTo && (
+                            <div
+                              className={`reply-mess p-3.5 mb-3 rounded-[5px] ${isMyMessage ? "bg-[#fff8f9]" : "bg-white"}`}
+                            >
+                              {msg.replyTo.type === "image" ? (
+                                <div className="flex gap-2">
+                                  {msg.replyTo.media?.image?.map(
+                                    (img, index) => (
+                                      <div
+                                        key={index}
+                                        className={clsx(
+                                          "h-30 overflow-hidden rounded-lg",
+                                          // (img.RATIO ?? 1) >= 1 && "w-30",
+                                        )}
+                                        // className={`${(img.RATIO ?? 1) >= 1 ? "w-30" : ""} h-30 overflow-hidden rounded-lg`}
+                                      >
+                                        <Image
+                                          src={img.THUMB || img.IMG || ""}
+                                          alt=""
+                                          width={
+                                            (msg.replyTo?.media?.image.length ??
+                                              0) > 1
+                                              ? "120px"
+                                              : "100%"
+                                          }
+                                          height={
+                                            (msg.replyTo?.media?.image.length ??
+                                              0) > 1
+                                              ? "120px"
+                                              : "100%"
+                                          }
+                                          preview={false}
+                                          style={{ objectFit: "cover" }}
+                                        />
+                                      </div>
+                                    ),
+                                  )}
+                                </div>
+                              ) : (
+                                <p className="text-[13px] text-[#686868] truncate">
+                                  {msg.replyTo.message}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          <div className="message-body flex items-baseline">
+                            <p>{msg.message}</p>
+                            <p className="text-[12px] font-medium text-[#686868] pl-1.5">
+                              {formatDateWithType(msg.createdAt, "hh:mm")}
+                            </p>
+                          </div>
+                        </div>
                       </>
                     )}
+                  </div>
+                  <div className="action-message opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Dropdown
+                      menu={{
+                        items: [
+                          {
+                            key: "1",
+                            label: "Trả lời",
+                            onClick: () => setReplyMessage(msg),
+                          },
+                          {
+                            key: "2",
+                            label: "Chuyển tiếp",
+                            onClick: () => {},
+                          },
+                        ],
+                      }}
+                      trigger={["click"]}
+                    >
+                      <button className="bg-[#f2f2f6] w-8.25 h-8.25 rounded-[18px] text-[#a9a9a9] mx-2 cursor-pointer">
+                        <i className="fpme-ellipsis"></i>
+                      </button>
+                    </Dropdown>
                   </div>
                 </div>
               </div>
@@ -260,6 +343,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                 placeholder="Nhập tin nhắn..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
+                disabled={images.length > 0}
                 onPressEnter={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -293,6 +377,64 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
             </div>
 
             <div className="media-chat absolute bottom-22.75">
+              {replyMessage && (
+                <div className="reply-preview relative flex items-center gap-2 bg-[#f4f4f4] rounded-lg pr-12 py-2 mb-2">
+                  <div className="flex-1 border-l-2 border-[#f3495b] pl-2">
+                    <p className="text-[12px] text-[#f3495b] font-semibold">
+                      Trả lời
+                    </p>
+                    {replyMessage.type === "image" ? (
+                      <div className="flex gap-2">
+                        {replyMessage.media?.image.map((item, index) => (
+                          <div
+                            key={index}
+                            className="media-reply overflow-hidden mt-3.5"
+                          >
+                            <Image
+                              style={{
+                                objectFit: "cover",
+                                width:
+                                  (replyMessage.media?.image?.length ?? 0) > 1
+                                    ? "120px"
+                                    : "100%",
+                                height:
+                                  (replyMessage.media?.image?.length ?? 0) > 1
+                                    ? "120px"
+                                    : "auto",
+                                maxWidth:
+                                  (replyMessage.media?.image?.length ?? 0) === 1
+                                    ? 214
+                                    : undefined,
+                                maxHeight:
+                                  (replyMessage.media?.image?.length ?? 0) === 1
+                                    ? 128
+                                    : undefined,
+                                borderRadius: "10px",
+                              }}
+                              src={item.IMG}
+                              alt={item.DES}
+                              width="100%"
+                              height="100%"
+                              preview={false}
+                              loading="lazy"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[13px] text-[#686868] truncate">
+                        {replyMessage.message}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setReplyMessage(null)}
+                    className="text-[#a9a9a9] text-xs cursor-pointer text-[18px] absolute top-2 right-2"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
               <div className="select-img-chat  flex gap-2.5 ">
                 {images.map((item, index) => (
                   <div key={index} className="w-30 h-30 relative">
@@ -334,8 +476,12 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
 
             <button
               type="button"
+              disabled={
+                images.some((img) => img.loading) ||
+                (inputMessage.trim() === "" && images.length === 0)
+              }
               onClick={() => handleSend()}
-              className="bg-[#f3495b] text-white px-4 py-2 rounded-lg cursor-pointer"
+              className="bg-[#f3495b] text-white px-4 py-2 rounded-lg cursor-pointer disabled:bg-[#f4f4f4] disabled:text-[#999] disabled:cursor-not-allowed"
             >
               Gửi
             </button>

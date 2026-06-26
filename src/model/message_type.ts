@@ -24,5 +24,14 @@ export interface IMessage {
   type?: "text" | "sticker" | "image";
   media?: {
     image: ContentImg[];
-  }
+  };
+  replyTo?: {
+    _id?: string;
+    message?: string;
+    senderName?: string;
+    type?: "text" | "sticker" | "image";
+    media?: {
+    image: ContentImg[];
+  };
+} | null;
 }

@@ -70,6 +70,8 @@ export const useCreatePiepController = () => {
             })
         );
 
+        formData.append('folder', 'posts');
+
         // thêm preview tạm
         const tempMedia = files.map((file, index) => ({
             FM600: 0,

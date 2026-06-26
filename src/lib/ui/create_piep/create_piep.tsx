@@ -100,7 +100,7 @@ function CreatePiepScreen() {
               key={index}
               className="mb-3 w-full overflow-hidden"
               // style={{ aspectRatio: `${img.RATIO || 1}` }}
-              style={{ aspectRatio: 16 / 9 }}
+             style={{ aspectRatio: img.SRC ? 16 / 9 : undefined }}
             >
               <div className="media-player bg-black relative w-full h-full">
                 {img.SRC ? (
@@ -189,8 +189,13 @@ function CreatePiepScreen() {
         </div>
         <div className="footer pt-2.5 text-end cursor-pointer">
           <button
+            disabled={
+              images.some((img) => img.loading) ||
+              PV305.trim() === "" ||
+              PV301.trim() === ""
+            }
             onClick={checkEdit ? onEdit : onSubmitCreatePiep}
-            className={`${isLoading ? "bg-[#f4f4f4]" : "bg-[#f3495b]"} ${isLoading ? "text-[#999]" : "text-white"} px-4 py-2 rounded-lg cursor-pointer`}
+            className="bg-[#f3495b] text-white px-4 py-2 rounded-lg cursor-pointer disabled:bg-[#f4f4f4] disabled:text-[#999] disabled:cursor-not-allowed"
           >
             {checkEdit ? t("Lưu") : t("submit_post_create")}
           </button>
