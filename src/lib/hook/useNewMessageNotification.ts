@@ -25,10 +25,33 @@ export const useNewMessageNotification = () => {
     const ICON_NOTIFIED = 'https://res.cloudinary.com/dcu47l2uc/image/upload/v1782702037/icon-notified_aqbolu.png';
 
     const setFavicon = (url: string, bustCache = false) => {
-        const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
-        if (link) {
-            link.href = bustCache ? `${url}?t=${Date.now()}` : url;
-        }
+        const href = bustCache ? `${url}?=${Date.now()}` : url;
+        const customLink = document.getElementById("custom-favicon");
+        if (customLink) customLink.remove();
+
+        const defaultLink = document.querySelector("link[rel*='icon']:not(#custom-favicon)") as HTMLLinkElement;
+        if (defaultLink) defaultLink.style.display = 'none';
+
+        const link = document.createElement("link");
+        link.rel = 'icon';
+        link.type = 'image/png';
+        link.href = href;
+        document.head.appendChild(link);
+
+        // setTimeout(() => {
+        //     try {
+        //         const oldLink = document.querySelector("link[rel*='icon']");
+        //         oldLink?.remove();
+
+        //         const link = document.createElement('link');
+        //         link.rel = 'icon';
+        //         link.type = 'image/png';
+        //         link.href = bustCache ? `${url}?t=${Date.now()}` : url;
+        //         document.head.appendChild(link);
+        //     } catch (e) {
+        //         console.log(e);
+        //     }
+        // }, 0);
     };
 
     useEffect(() => {
