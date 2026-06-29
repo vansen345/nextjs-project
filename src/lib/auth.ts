@@ -32,7 +32,8 @@ export const authOptions: NextAuthOptions = {
                     const profileRes = await fetch(`${process.env.API_BASE_URL}/login/getInfoUserLogin`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: credentials.email }), // ← dùng normalized
+                        body: JSON.stringify({ email: credentials.email }),
+                        cache: 'no-store',
                     });
                     const profile = await profileRes.json();
                     console.log('profile.elements', profile.elements);
