@@ -22,16 +22,16 @@
 }
 
 #nprogress .bar {
-    background: #f3495b !important;
-    height: 3px !important;
+  background: #f3495b !important;
+  height: 3px !important;
 }
 
 #nprogress .peg {
-    box-shadow: 0 0 10px #f3495b !important;
+  box-shadow: 0 0 10px #f3495b !important;
 }
 
 #nprogress .spinner-icon {
-    display: none !important;
+  display: none !important;
 }
 
 body {
@@ -107,4 +107,8 @@ body.hydrated .header-content {
   background-size: contain;
   background-position: bottom right;
   background-repeat: no-repeat;
+}
+
+p {
+  margin-bottom: 0;
 }

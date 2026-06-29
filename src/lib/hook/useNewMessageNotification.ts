@@ -24,17 +24,10 @@ export const useNewMessageNotification = () => {
     const ICON_DEFAULT = 'https://res.cloudinary.com/dcu47l2uc/image/upload/v1782701927/icon_vj49z7.png';
     const ICON_NOTIFIED = 'https://res.cloudinary.com/dcu47l2uc/image/upload/v1782702037/icon-notified_aqbolu.png';
 
-    const setFavicon = (url: string) => {
-        try {
-            const oldLink = document.querySelector("link[rel*='icon']");
-            oldLink?.remove();
-
-            const link = document.createElement('link');
-            link.rel = 'icon';
-            link.href = url;
-            document.head?.appendChild(link);
-        } catch (e) {
-            console.log(e);
+    const setFavicon = (url: string, bustCache = false) => {
+        const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+        if (link) {
+            link.href = bustCache ? `${url}?t=${Date.now()}` : url;
         }
     };
 
@@ -46,7 +39,7 @@ export const useNewMessageNotification = () => {
         console.log("START BLINKING", senderName);
         senderNameRef.current = senderName;
         if (intervalRef.current) clearInterval(intervalRef.current);
-        setFavicon(ICON_NOTIFIED);
+        setFavicon(ICON_NOTIFIED, true);
 
         let toggle = false;
         intervalRef.current = setInterval(() => {

@@ -109,7 +109,7 @@ function Header() {
           </div>
           <div style={{ flex: 1 }}></div>
 
-          <div className="menu-text hidden md:flex gap-4 mr-8 shrink-0 mt-4">
+          <div className="menu-text hidden md:flex gap-4 mr-8 shrink-0">
             <p
               className={`text-header ${getColor2("/community")}`}
               onClick={() => handleLogoClick("community")}
