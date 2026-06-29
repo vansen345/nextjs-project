@@ -21,6 +21,23 @@ export const useNewMessageNotification = () => {
     const senderNameRef = useRef<string>('');
     const pathname = usePathname();
 
+    const ICON_DEFAULT = 'https://res.cloudinary.com/dcu47l2uc/image/upload/v1782701927/icon_vj49z7.png';
+    const ICON_NOTIFIED = 'https://res.cloudinary.com/dcu47l2uc/image/upload/v1782702037/icon-notified_aqbolu.png';
+
+    const setFavicon = (url: string) => {
+        try {
+            const oldLink = document.querySelector("link[rel*='icon']");
+            oldLink?.remove();
+
+            const link = document.createElement('link');
+            link.rel = 'icon';
+            link.href = url;
+            document.head?.appendChild(link);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     useEffect(() => {
         if (userId) joinRoom(userId);
     }, [userId]);
@@ -29,6 +46,7 @@ export const useNewMessageNotification = () => {
         console.log("START BLINKING", senderName);
         senderNameRef.current = senderName;
         if (intervalRef.current) clearInterval(intervalRef.current);
+        setFavicon(ICON_NOTIFIED);
 
         let toggle = false;
         intervalRef.current = setInterval(() => {
@@ -43,6 +61,7 @@ export const useNewMessageNotification = () => {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
+        setFavicon(ICON_DEFAULT);
     }, []);
 
     useEffect(() => {
@@ -65,7 +84,7 @@ export const useNewMessageNotification = () => {
             );
             if (data.senderId === userId) return;
             if (!pathname.startsWith("/inbox")) {
-                dispatch(setHasNewMessage(true)) ;
+                dispatch(setHasNewMessage(true));
                 startBlinking(data.senderName || 'Tin nhắn mới');
             }
         });

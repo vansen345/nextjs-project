@@ -2,6 +2,7 @@ import { useAuth } from "@/lib/hook/useAuth";
 import { useSocket } from "@/lib/hook/useSocket";
 import NProgress from "@/lib/nprogress";
 import { getDecryptedTitle, HomeItem } from "@/model/home_type";
+import { ContentImg } from "@/model/upload_media";
 import { UserType } from "@/model/user_type";
 import { RootState } from "@/store";
 import imageCompression from "browser-image-compression";
@@ -42,9 +43,11 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
 
     const [valueName, setValueName] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
-    const [avatarUrl, setAvatarUrl] = useState(profile?.NV126 ?? '');
+    // const [avatarUrl, setAvatarUrl] = useState(profile?.NV126 ?? '');
     const [uploadMedia] = useUploadImgVideoMutation();
     const { update } = useSession();
+    const [avatarUrl2, setAvatarUrl2] = useState<ContentImg | null>(null);
+
 
     const fetchListPiepByUser = useCallback(async (newOffSet: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
@@ -207,33 +210,52 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
     const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
         const formData = new FormData();
         const compress = await imageCompression(file, {
             maxSizeMB: 1,
-            maxWidthOrHeight: 1280,
-        })
+            maxWidthOrHeight: 150,
+        });
 
-        formData.append('NV126', compress, compress.name);
+        formData.append('media', compress, compress.name);
+        formData.append('folder', 'avatars');
+
+        setAvatarUrl2({
+            FM600: 0,
+            index: 1,
+            IMG: URL.createObjectURL(file),
+            RATIO: 1,
+            THUMB: URL.createObjectURL(file),
+            DES: "",
+            loading: true,
+            progress: 0,
+        });
+
+        const progressInterval = setInterval(() => {
+            setAvatarUrl2(prev => prev ? { ...prev, progress: (prev.progress || 0) < 90 ? (prev.progress || 0) + 10 : prev.progress } : prev);
+        }, 200);
+
         try {
             const rs = await uploadMedia(formData).unwrap();
-            setAvatarUrl(rs.elements[0].IMG || '');
+            clearInterval(progressInterval);
+            setAvatarUrl2({ ...rs.elements[0], loading: false, progress: 100 });
         } catch (error) {
+            clearInterval(progressInterval);
             console.log(error);
-
         }
-    }
+    };
 
     const onEditProfile = async () => {
         const rs = await callApiEditProfile({
             FO100: FO100,
             NV106: valueName || profile?.NV106 || '',
-            NV126: avatarUrl || profile?.NV126 || '',
+            NV126: avatarUrl2?.IMG || profile?.NV126 || '',
         }).unwrap();
 
         if (rs.elements != null) {
             await update({
-                NV106: valueName,
-                NV126: avatarUrl,
+                NV106: valueName || profile?.NV106 || '',
+                NV126: avatarUrl2?.IMG || profile?.NV126 || '',
             });
             onUpdateProfile?.(rs.elements);
             dispatch(setIsModalEditProfile(false))
@@ -246,5 +268,5 @@ export const useProfileController = (FO100: number, initialProfile: UserType | n
 
 
 
-    return { profile, listPost, myPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike, handleSendRequest, handleAcceptRequest, friendStatus, handleCancelRequest, handleRejectRequest, handleUnfriend, isModalOpenEdit, onOpenEdit, onChangeName, onEditProfile, setProfile, avatarUrl, handleChangeAvatar, handleOpenMedia, inputRef, onCloseEdit };
+    return { profile, listPost, myPost, dispatch, isLoggedIn, bottomRef, handleItemClick, handleLike, handleSendRequest, handleAcceptRequest, friendStatus, handleCancelRequest, handleRejectRequest, handleUnfriend, isModalOpenEdit, onOpenEdit, onChangeName, onEditProfile, setProfile, handleChangeAvatar, handleOpenMedia, inputRef, onCloseEdit, avatarUrl2 };
 }

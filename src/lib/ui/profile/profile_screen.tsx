@@ -5,9 +5,11 @@ import { useProfileController } from "@/features/profile/profile_controller";
 import { getTimeText } from "@/lib/util";
 import { getDecryptedTitle } from "@/model/home_type";
 import { UserType } from "@/model/user_type";
-import { Avatar, Divider, Dropdown, Image, Masonry } from "antd";
+import { Image as AntImage, Avatar, Divider, Dropdown, Masonry } from "antd";
 import { t } from "i18next";
+import Image from "next/image";
 import EditProfileScreen from "./edit_profile_screen";
+
 
 function ProfileScreen({
   FO100,
@@ -33,7 +35,7 @@ function ProfileScreen({
     handleUnfriend,
     onOpenEdit,
     isModalOpenEdit,
-    setProfile
+    setProfile,
   } = useProfileController(FO100, initialProfile);
 
   return (
@@ -42,7 +44,7 @@ function ProfileScreen({
         <div className="profile-header relative">
           <div>
             <div className="profile-thumbnail">
-              <Image
+              <AntImage
                 src="https://cdn.piepme.com/1414/images/piep-hleMJRu916850847925131685084792513.jpeg"
                 alt="Profile banner"
                 width="100%"
@@ -54,11 +56,13 @@ function ProfileScreen({
             </div>
             <div className="profile-info flex items-end w-full absolute -bottom-15.75 px-19.5">
               <div className="div-name flex items-end w-full">
-                <div className="profile-avatar rounded-[89px] border-8 border-white bg-[#ececec]">
-                  <Avatar
-                    size={142}
-                    shape="circle"
-                    src={profile?.NV126 || null}
+                <div className="w-35.5 h-35.5 rounded-full border-8 border-white bg-[#ececec]">
+                  <Image
+                    src={profile?.NV126 || ""}
+                    alt="avatar"
+                    width={142}
+                    height={142}
+                    className="w-full h-full rounded-[64px] object-cover"
                   />
                 </div>
                 <div className="profile-name">
@@ -181,7 +185,7 @@ function ProfileScreen({
               >
                 <div className="w-full min-h-50 max-h-75 flex relative">
                   {data.PV307 && (
-                    <Image
+                    <AntImage
                       src={data.PV307}
                       alt=""
                       loading="lazy"
@@ -229,7 +233,7 @@ function ProfileScreen({
                       }}
                     >
                       {data?.ISLIKED ? (
-                        <Image
+                        <AntImage
                           src="https://piepme.com/_nuxt/liked.png"
                           alt=""
                           width={20}

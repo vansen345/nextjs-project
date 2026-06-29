@@ -7,8 +7,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
-      'react-hooks/exhaustive-deps': 'off',
-    }
+      "react-hooks/exhaustive-deps": "off",
+      "@next/next/no-img-element": "off",
+    },
   },
   globalIgnores([
     // Default ignores of eslint-config-next:

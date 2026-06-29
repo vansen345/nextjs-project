@@ -2,7 +2,8 @@
 
 import { useInboxController } from "@/features/inbox/inbox_controller";
 import { formatDateWithType } from "@/lib/util";
-import { Avatar, Dropdown, Image, Input, Popover } from "antd";
+import { Image as AntImage, Avatar, Dropdown, Input, Popover } from "antd";
+import TextArea from "antd/es/input/TextArea";
 import clsx from "clsx";
 import EmojiPicker from "emoji-picker-react";
 import { useRouter } from "next/navigation";
@@ -96,7 +97,13 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
               {users.map((user) => (
                 <SwiperSlide key={user.id}>
                   <div className="flex flex-col items-center gap-2 max-w-14">
-                    <Avatar src={user.avatar} size={52} />
+                    <img
+                      src={user.avatar}
+                      alt="avatar"
+                      width={52}
+                      height={52}
+                      className="rounded-[80px]"
+                    />
                     <span style={{ ...ellipsisStyle, maxWidth: 60 }}>
                       {user.name}
                     </span>
@@ -125,23 +132,30 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                     // //   setSelectedConversationId(conversation.conversationId);
                   }}
                 >
-                  <div className="relative shrink-0">
-                    <Avatar src={conversation.NV126} size={52} />
-                    {conversation.isUnread && (
-                      <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
-                    )}
+                  <div className="conversation-body relative shrink-0">
+                    <div className="avatar-convensation">
+                      <Avatar src={conversation.NV126} size={52} />
+                      {conversation.isUnread && (
+                        <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[14px] font-semibold pb-1.5">
+                  <div className="message-convensation">
+                    <span className="text-[14px] font-semibold pb-1.5 block">
                       {conversation.NV106}
-                    </p>
-                    <p className="text-[12px] overflow-hidden text-ellipsis whitespace-nowrap text-[#888] font-semibold">
-                      {conversation.lastMessageType === "image"
-                        ? conversation.lastMessageSenderId === userId
-                          ? "Bạn đã gửi hình ảnh"
-                          : `${conversation.lastMessageSenderName} đã gửi hình ảnh`
-                        : `${conversation.lastMessageSenderName}: ${conversation.lastMessage}`}
-                    </p>
+                    </span>
+                    <div className="message-content-convensation">
+                      {conversation.lastMessage !== null &&
+                        conversation.lastMessageType !== null && (
+                          <p className="w-66.75 text-[12px] overflow-hidden text-ellipsis whitespace-nowrap text-[#888] font-semibold">
+                            {conversation.lastMessageType === "image"
+                              ? conversation.lastMessageSenderId === userId
+                                ? "Bạn đã gửi hình ảnh"
+                                : `${conversation.lastMessageSenderName} đã gửi hình ảnh`
+                              : `${conversation.lastMessageSenderName}: ${conversation.lastMessage}`}
+                          </p>
+                        )}
+                    </div>
                   </div>
                 </div>
               );
@@ -177,7 +191,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                 >
                   {" "}
                   <div
-                    className={`p-3.5 rounded-2xl wrap-break-word inline-flex items-baseline font-medium ${
+                    className={`p-3.5 rounded-2xl wrap-break-word inline-flex items-baseline font-medium max-w-[70%] self-start ${
                       isMyMessage
                         ? "bg-[#fff0f2] text-black rounded-br-sm"
                         : "bg-gray-100 text-black rounded-bl-sm"
@@ -190,7 +204,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                         </p>
                         {msg.media?.image?.length === 1 ? (
                           <div className="one-img max-w-96.25">
-                            <Image
+                            <AntImage
                               src={
                                 msg.media.image[0].THUMB ||
                                 msg.media.image[0].IMG ||
@@ -221,7 +235,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                                 key={index}
                                 className="overflow-hidden rounded-lg shrink-0"
                               >
-                                <Image
+                                <AntImage
                                   src={img.THUMB || img.IMG || ""}
                                   alt=""
                                   loading="lazy"
@@ -259,7 +273,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                                         )}
                                         // className={`${(img.RATIO ?? 1) >= 1 ? "w-30" : ""} h-30 overflow-hidden rounded-lg`}
                                       >
-                                        <Image
+                                        <AntImage
                                           src={img.THUMB || img.IMG || ""}
                                           alt=""
                                           width={
@@ -289,7 +303,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                             </div>
                           )}
                           <div className="message-body flex items-baseline">
-                            <p>{msg.message}</p>
+                            <span className="leading-[1.6]">{msg.message}</span>
                             <p className="text-[12px] font-medium text-[#686868] pl-1.5">
                               {formatDateWithType(msg.createdAt, "hh:mm")}
                             </p>
@@ -339,7 +353,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
               onChange={handleMediaChange}
             />
             <div className="relative flex-1 flex items-center bg-[#f4f4f4] rounded-lg px-3">
-              <Input
+              {/* <Input
                 placeholder="Nhập tin nhắn..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
@@ -353,6 +367,24 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                 classNames={{
                   root: "!bg-transparent !border-none flex-1 !shadow-none !outline-none",
                   input:
+                    "!bg-transparent !outline-none !shadow-none !border-none focus:!outline-none focus:!shadow-none !p-0",
+                }}
+              /> */}
+              <TextArea
+                placeholder="Nhập tin nhắn..."
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                disabled={images.length > 0}
+                onPressEnter={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                autoSize={{ minRows: 1, maxRows: 4 }}
+                style={{ resize: "none" }}
+                classNames={{
+                  textarea:
                     "!bg-transparent !outline-none !shadow-none !border-none focus:!outline-none focus:!shadow-none !p-0",
                 }}
               />
@@ -390,7 +422,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                             key={index}
                             className="media-reply overflow-hidden mt-3.5"
                           >
-                            <Image
+                            <AntImage
                               style={{
                                 objectFit: "cover",
                                 width:
@@ -438,7 +470,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
               <div className="select-img-chat  flex gap-2.5 ">
                 {images.map((item, index) => (
                   <div key={index} className="w-30 h-30 relative">
-                    <Image
+                    <AntImage
                       src={item.IMG}
                       alt={item.DES}
                       width="100%"
@@ -481,7 +513,7 @@ function InboxScreen({ conversationId }: InboxScreenProps) {
                 (inputMessage.trim() === "" && images.length === 0)
               }
               onClick={() => handleSend()}
-              className="bg-[#f3495b] text-white px-4 py-2 rounded-lg cursor-pointer disabled:bg-[#f4f4f4] disabled:text-[#999] disabled:cursor-not-allowed"
+              className="self-end bg-[#f3495b] text-white! px-4 py-2 rounded-lg cursor-pointer disabled:bg-[#f4f4f4] disabled:text-[#999]! disabled:cursor-not-allowed"
             >
               Gửi
             </button>

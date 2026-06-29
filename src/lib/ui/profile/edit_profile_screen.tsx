@@ -17,10 +17,10 @@ function EditProfileScreen({
     inputRef,
     onChangeName,
     onEditProfile,
-    avatarUrl,
     handleChangeAvatar,
     handleOpenMedia,
-    onCloseEdit
+    onCloseEdit,
+    avatarUrl2,
   } = useProfileController(FO100, initialProfile, onUpdateProfile);
 
   return (
@@ -61,13 +61,23 @@ function EditProfileScreen({
               <div className="flex items-center gap-2.5 -mt-18 px-14.5">
                 <div
                   onClick={handleOpenMedia}
-                  className="profile-avatar brightness-75 rounded-[89px] border-8 border-white bg-[#ececec] relative"
+                  className="relative profile-avatar brightness-75 rounded-[89px] border-8 border-white bg-[#ececec]"
                 >
                   <Avatar
                     size={142}
                     shape="circle"
-                    src={avatarUrl || profile?.NV126}
+                    src={avatarUrl2?.IMG || profile?.NV126}
                   />
+                  {avatarUrl2?.loading && (
+                    <div className="absolute inset-0 flex flex-col justify-end p-2">
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div
+                          className="bg-blue-500 h-1.5 rounded-full transition-all duration-200"
+                          style={{ width: `${avatarUrl2.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <i
                       data-v-2f5d3363=""
@@ -122,7 +132,10 @@ function EditProfileScreen({
                   </div>
                 </div>
                 <div className="footer-edit flex justify-end pt-14">
-                  <button onClick={onCloseEdit} className="bg-[#f4f4f4] w-13.75 h-10 rounded-[18px] text-[#f3495b] mr-2 cursor-pointer">
+                  <button
+                    onClick={onCloseEdit}
+                    className="bg-[#f4f4f4] w-13.75 h-10 rounded-[18px] text-[#f3495b] mr-2 cursor-pointer"
+                  >
                     Huỷ
                   </button>
                   <button
