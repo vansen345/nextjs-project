@@ -43,7 +43,7 @@ export const useHeaderController = () => {
   const onCloseRegister = () => dispatch(setIsModalOpenRegiser(false));
   const onLogout = () => {
     dispatch(setShouldRefreshHome(true));
-    signOut({ redirect: false });
+    signOut({ callbackUrl: '/' });
   };
   const onOpenCreatePiep = () => dispatch(setIsModalCreatePiep(true));
 
