@@ -7,7 +7,7 @@ import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestor
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCommentUpdate } from '../detail/detail_redux_slice';
-import { useInsertCommentMutation, useLazyGetListCommentQuery } from "./comment_services";
+import { useDeleteCommentMutation, useInsertCommentMutation, useLazyGetListCommentQuery } from "./comment_services";
 
 export const useCommentController = () => {
     const selectedItem = useSelector((state: RootState) => state.detail.selectedItem);
@@ -27,8 +27,13 @@ export const useCommentController = () => {
     const hasFetchedRef = useRef(false);
     const [insertComment] = useInsertCommentMutation();
     const [trigger] = useLazyGetListCommentQuery();
+    const [deleteComment] = useDeleteCommentMutation();
     const [messageApi, contextHolder] = message.useMessage();
     const LIMIT = 15;
+    const [replyComment, setReplyComment] = useState("");
+    const [comment, setComment] = useState<IComment | null>(null);
+
+
 
     const fetchList = useCallback(async (newOffset: number, isInitial = false) => {
         if (isLoadingRef.current || (!isInitial && !hasMoreRef.current)) return;
@@ -54,41 +59,19 @@ export const useCommentController = () => {
     }, [trigger, selectedItem])
 
     useEffect(() => {
-        if (!selectedItem?.PP300 || hasFetchedRef.current) return;
-        hasFetchedRef.current = true
-        offsetRef.current = 0
-        hasMoreRef.current = true
+        if (!selectedItem?.PP300) return;
+        hasFetchedRef.current = false;
+        offsetRef.current = 0;
+        hasMoreRef.current = true;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setListComment([]);
         fetchList(0, true);
-    }, [selectedItem?.PP300, fetchList]);
-
-    // useEffect(() => {
-    //     if (!selectedItem?.PP300) return;
-
-    //     const q = query(
-    //         collection(firebase, 'comments'),
-    //         where('PP300', '==', selectedItem.PP300),
-    //         orderBy('createdAt', 'asc')
-    //     );
-
-    //     const unsubscribe = onSnapshot(q, (snapshot) => {
-    //         console.log('snapshot triggered', snapshot.docChanges().length);
-    //         snapshot.docChanges().forEach((change) => {
-    //             if (change.type === 'added') {
-    //                 const data = change.doc.data() as IComment;
-    //                 setListComment((prev) => {
-    //                     const exists = prev.some(item => item._id === change.doc.id);
-    //                     if (exists) return prev;
-    //                     return [...prev, { ...data, _id: change.doc.id } as IComment];
-    //                 });
-    //             }
-    //         });
-    //     });
-
-    //     return () => unsubscribe();
-    // }, [selectedItem?.PP300]);
+    }, [selectedItem?.PP300]);
 
     useEffect(() => {
+
         if (!selectedItem?.PP300) return;
+        console.log("🔥 Subscribe", selectedItem.PP300);
 
         const q = query(
             collection(firebase, 'comments'),
@@ -97,47 +80,95 @@ export const useCommentController = () => {
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
+            console.log("📩 Snapshot", snapshot.docs.length);
             snapshot.docChanges().forEach((change) => {
-                if (change.type !== 'added') return;
                 const data = change.doc.data() as IComment;
                 const comment = { ...data, _id: change.doc.id } as IComment;
 
-                setListComment((prev) => {
-                    const exists = prev.some((item) => item._id === change.doc.id);
-                    if (exists) return prev;
-
-                    // ✅ Dùng setTimeout để tách khỏi render cycle
-                    setTimeout(() => {
-                        dispatch(setCommentUpdate({
-                            PP300: selectedItem.PP300 || 0,
-                            TOTALCOMMENTS: prev.length + 1
-                        }));
-                    }, 0);
-
-                    return [...prev, comment];
+                snapshot.docs.forEach(doc => {
+                    console.log(doc.id, doc.data().PP300);
                 });
+                if (change.type === 'added') {
+
+                    if (snapshot.metadata.hasPendingWrites) return;
+
+                    setListComment((prev) => {
+                        const exists = prev.some((item) => item._id === change.doc.id);
+                        if (exists) return prev;
+
+                        setTimeout(() => {
+                            dispatch(setCommentUpdate({
+                                PP300: selectedItem.PP300 || 0,
+                                TOTALCOMMENTS: prev.length + 1
+                            }));
+                        }, 0);
+
+                        return [...prev, comment];
+                    });
+                }
+
+                if (change.type === 'modified') {
+                    setListComment((prev) =>
+                        prev.map((item) =>
+                            item._id === change.doc.id ? { ...item, ...comment } : item
+                        )
+                    );
+                }
             });
         });
 
-        return () => unsubscribe();
+        return () => {
+            console.log("❌ Unsubscribe", selectedItem.PP300);
+            unsubscribe();
+        }
     }, [selectedItem?.PP300]);
 
-    const handleInsertComment = async () => {
-        if (!inputComment.trim()) return;
+    const handleInsertComment = async (text: string) => {
+        if (!text.trim()) return;
         try {
             await insertComment({
                 PP300: selectedItem?.PP300,
-                comment: inputComment,
+                comment: comment ? "" : inputComment,
                 FO100: FO100 || 0,
                 NV106: NV106 || "",
                 NV126: NV126 || "",
+                reply: comment ? {
+                    _id: comment._id,
+                    FO100: comment.FO100,
+                    NV106: comment.NV106,
+                    NV126: comment.NV126,
+                    comment: text,
+                } : undefined,
             }).unwrap();
             setInputComment("");
-            dispatch(setCommentUpdate({ PP300: selectedItem?.PP300 || 0, TOTALCOMMENTS: (listComment.length || 0) + 1 }));
+            setReplyComment("");
+            setComment(null);
+            if (!comment) {
+                dispatch(setCommentUpdate({
+                    PP300: selectedItem?.PP300 || 0,
+                    TOTALCOMMENTS: (listComment.length || 0) + 1
+                }));
+            }
         } catch (error) {
             console.log(error);
         }
     };
+
+    const onActionReply = (comment: IComment) => {
+        setReplyComment('');
+        setComment(comment);
+    }
+
+    const onDeleteComment = async (commentId: string) => {
+        const result = await deleteComment({ id: commentId }).unwrap();
+        if (result.elements > 0) {
+            setListComment((prev) =>
+                prev.filter((item) => item._id !== commentId)
+            );
+        } else {
+            messageApi.error("Xoá không thành công")
+        }
+    }
 
     return {
         listComment,
@@ -146,6 +177,9 @@ export const useCommentController = () => {
         handleInsertComment,
         isLoading,
         hasMore,
+        onActionReply,
+        replyComment, setReplyComment,
+        comment, setComment, onDeleteComment
     };
 
 }

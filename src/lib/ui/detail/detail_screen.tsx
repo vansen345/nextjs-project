@@ -1,6 +1,9 @@
 import { useCommentController } from "@/features/comment/comment_controller";
 import { useDetailPageController } from "@/features/detail/detail_controller";
-import { setEditPostData, setIsEditMode } from "@/features/detail/detail_redux_slice";
+import {
+  setEditPostData,
+  setIsEditMode,
+} from "@/features/detail/detail_redux_slice";
 import {
   setIsModalCreatePiep,
   setIsModalOpenLogin,
@@ -35,9 +38,14 @@ function DetailScreen() {
     inputComment,
     setInputComment,
     handleInsertComment,
-
+    onActionReply,
     isLoading,
     hasMore,
+    replyComment,
+    setReplyComment,
+    comment,
+    setComment,
+    onDeleteComment,
   } = useCommentController();
 
   const dataMedia = [
@@ -103,7 +111,7 @@ function DetailScreen() {
         }}
       >
         <div className="info-user-piep w-full absolute -top-11 left-0 flex items-center justify-between">
-          <div className="info cursor-pointer" onClick={onOpenProfile} >
+          <div className="info cursor-pointer" onClick={onOpenProfile}>
             <Avatar
               size="large"
               shape="circle"
@@ -134,7 +142,9 @@ function DetailScreen() {
         </div>
         <div className="detail-body">
           <div className="detail-title">
-            <h1 className="text-title whitespace-pre-wrap">{getDecryptedTitle(detail?.PV301)}</h1>
+            <h1 className="text-title whitespace-pre-wrap">
+              {getDecryptedTitle(detail?.PV301)}
+            </h1>
           </div>
           <div className="text-base font-normal text-black leading-[1.56] mb-5 whitespace-pre-wrap">
             {getDecryptedContent(detail?.PV305)}
@@ -177,15 +187,26 @@ function DetailScreen() {
               </span>
             </div>
             {listComment.length > 0 && (
-              <ListComment listComment={listComment} />
+              <ListComment
+                onDeleteComment={(idComment) => onDeleteComment(idComment)}
+                textReply={replyComment}
+                setTextReply={setReplyComment}
+                setValueComment={setComment}
+                valueComment={comment}
+                listComment={listComment}
+                onReply={(comment) => {}}
+                onActionSendReply={(replyText) =>
+                  handleInsertComment(replyText)
+                }
+              />
             )}
           </div>
         </div>
         <div className="action-pieper grid gap-5 absolute top-0 -right-17.25">
-          <div className="close flex flex-col items-center">
+          <div className="close flex flex-col items-center cursor-pointer">
             <button
               onClick={handleCancel}
-              className="w-12 h-12 bg-[#4a4a4a] text-white rounded-full text-[10px] cursor-pointer"
+              className="w-12 h-12 bg-white text-white rounded-full text-[10px] cursor-pointer outline-none focus:outline-none"
             >
               <i className="fpme-close"></i>
             </button>
@@ -230,11 +251,13 @@ function DetailScreen() {
         </div>
 
         {isLoggedIn && (
-          <InputComment
-            inputComment={inputComment}
-            setInputComment={setInputComment}
-            handleInsertComment={handleInsertComment}
-          />
+          <div>
+            <InputComment
+              inputComment={inputComment}
+              setInputComment={setInputComment}
+              handleInsertComment={() => handleInsertComment(inputComment)}
+            />
+          </div>
         )}
       </Modal>
     </div>

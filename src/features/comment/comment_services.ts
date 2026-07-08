@@ -22,10 +22,18 @@ export const commentApi = createApi({
                 params: { limit, offset },
             })  
         }),
+        deleteComment:builder.mutation<BaseResponseObject<number>, { id: string }>({
+            query: ({ id }) => ({
+                url: "comment/deleteComment",
+                method: "POST",
+                body: { id },
+            })
+        })
     })
 })
 export const {
     useInsertCommentMutation,
     useGetListCommentQuery,
-    useLazyGetListCommentQuery
+    useLazyGetListCommentQuery,
+    useDeleteCommentMutation
 } = commentApi

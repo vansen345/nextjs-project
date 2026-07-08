@@ -75,7 +75,7 @@ function HomePageScreen() {
                 <div className="text-sm font-medium text-[#a9a9a9] mt-2.5">
                   {getTimeText(data?.PD308 || "")}
                 </div>
-                <div className="mt-3 flex gap-2.5 font-semibold text-[20px]">
+                <div className="mt-3 flex gap-8.5 font-semibold text-[20px]">
                   <button
                     className="flex items-center mr-6 cursor-pointer"
                     onClick={(e) => {

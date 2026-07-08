@@ -18,6 +18,7 @@ export const API_CONFIG = {
     POST_CREATE: "/home/createPost",
     UPLOAD_IMG: "/home/uploadImg",
     INSERTCOMMENT: "/comment/insertComment",
+    DELETECOMMENT: "/comment/deleteComment",
     GETLISTCOMMENT: "/comment/listComment",
     UPLOAD_MEDIA: "/media/uploadMedia",
     GETPROFILE: "/profile/getInforUser",
