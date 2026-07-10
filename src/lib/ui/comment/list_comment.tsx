@@ -13,6 +13,7 @@ export const ListComment = ({
   setTextReply,
   onActionSendReply,
   onDeleteComment,
+  onCloseReply
 }: {
   listComment: IComment[];
   onReply: (comment: IComment) => void;
@@ -22,6 +23,7 @@ export const ListComment = ({
   setTextReply: React.Dispatch<React.SetStateAction<string>>;
   onActionSendReply: (replyText: string) => void;
   onDeleteComment: (commentId: string) => void;
+  onCloseReply: () => void;
 }) => {
   const { NV106, NV126 } = useAuth();
 
@@ -41,7 +43,7 @@ export const ListComment = ({
             },
           ];
           return (
-            <div key={index} className="comment mb-3">
+            <div key={index} className="comment mb-3 mt-2.5">
               <div className="comment-body flex items-center gap-2.5">
                 <div className="content-comment inline-flex bg-white rounded-lg mb-1 pt-2.5 pr-5 pb-2.5 pl-2.5">
                   <div className="mr-2 w-9.75 h-9.75 rounded-4xl bg-white p-0.5 shadow-[0_4px_10px_0_rgba(0,0,0,0.15)]">
@@ -88,8 +90,7 @@ export const ListComment = ({
                 </div>
               </div>
 
-              {/* hiện replies nếu có */}
-              {Array.isArray(comment.reply) && comment.reply.length > 0 && (
+              {(comment.reply ?? []).length > 0 && (
                 <div className="ml-10 mt-2 flex flex-col gap-2">
                   {comment.reply?.map((reply, i) => (
                     <div key={i}>
@@ -118,6 +119,9 @@ export const ListComment = ({
                           onClick={() => onReply(comment)}
                         >
                           <p className="font-bold">Phản hồi</p>
+                        </div>
+                        <div className="text-[12px] font-medium">
+                          {getTimeText(reply.createdAt || new Date())}
                         </div>
                       </div>
                     </div>
@@ -150,15 +154,18 @@ export const ListComment = ({
                       </div>
                     </div>
                   </div>
-                  <div className="action-reply text-right">
+                  <div className="action-reply flex justify-end gap-1">
+                    <button onClick={onCloseReply} type="button" className="bg-black w-7.5 h-7.5 rounded-[15px] cursor-pointer flex items-center justify-center">
+                      <i className="fpme-close text-white text-[9px]"></i>
+                    </button>
                     <button
                       onClick={() => onActionSendReply(textReply)}
                       type="button"
                       disabled={textReply.trim() === ""}
-                      className="ml-auto! bg-[linear-gradient(89deg,#f3495b_1%,#f1874d_101%)] w-7.5 h-7.5 rounded-[15px] cursor-pointer flex items-center justify-center disabled:bg-[#f4f4f4]! disabled:cursor-not-allowed"
+                      className="bg-[linear-gradient(89deg,#f3495b_1%,#f1874d_101%)] w-7.5 h-7.5 rounded-[15px] cursor-pointer flex items-center justify-center disabled:bg-[#f4f4f4]! disabled:cursor-not-allowed"
                     >
                       <span>
-                        <i className="text-white fpme-arrow-top"></i>
+                        <i className="text-white text-[12px] fpme-arrow-top"></i>
                       </span>
                     </button>
                   </div>

@@ -187,18 +187,29 @@ function DetailScreen() {
               </span>
             </div>
             {listComment.length > 0 && (
-              <ListComment
-                onDeleteComment={(idComment) => onDeleteComment(idComment)}
-                textReply={replyComment}
-                setTextReply={setReplyComment}
-                setValueComment={setComment}
-                valueComment={comment}
-                listComment={listComment}
-                onReply={(comment) => {}}
-                onActionSendReply={(replyText) =>
-                  handleInsertComment(replyText)
-                }
-              />
+              <div>
+               {listComment.length>15 && (
+                <div className="load-more-comment">
+                  <span className="text-load-more">Xem thêm</span>
+                </div>
+               )}
+                <ListComment
+                  onDeleteComment={(idComment) => onDeleteComment(idComment)}
+                  textReply={replyComment}
+                  setTextReply={setReplyComment}
+                  setValueComment={setComment}
+                  valueComment={comment}
+                  listComment={listComment}
+                  onReply={(comment) => onActionReply(comment)}
+                  onActionSendReply={(replyText) =>
+                    handleInsertComment(replyText)
+                  }
+                  onCloseReply = {()=>{
+                    setReplyComment('');
+                    setComment(null);
+                  }}
+                />
+              </div>
             )}
           </div>
         </div>

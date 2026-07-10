@@ -1,6 +1,6 @@
 import { firebase } from '@/lib/firebase_config';
 import { useAuth } from '@/lib/hook/useAuth';
-import { IComment } from "@/model/comment_type";
+import { IComment, IReply } from "@/model/comment_type";
 import { RootState } from "@/store";
 import { message } from 'antd';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
@@ -58,6 +58,11 @@ export const useCommentController = () => {
 
     }, [trigger, selectedItem])
 
+    const handleLoadMore = () => {
+        if (hasMore && !isLoadingRef.current) {
+            fetchList(offsetRef.current);
+        }
+    }
     useEffect(() => {
         if (!selectedItem?.PP300) return;
         hasFetchedRef.current = false;
@@ -138,7 +143,7 @@ export const useCommentController = () => {
                     NV106: comment.NV106,
                     NV126: comment.NV126,
                     comment: text,
-                } : undefined,
+                } as unknown as IReply[] : undefined,
             }).unwrap();
             setInputComment("");
             setReplyComment("");
@@ -179,7 +184,8 @@ export const useCommentController = () => {
         hasMore,
         onActionReply,
         replyComment, setReplyComment,
-        comment, setComment, onDeleteComment
+        comment, setComment, onDeleteComment,
+        handleLoadMore
     };
 
 }

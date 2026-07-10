@@ -15,5 +15,5 @@ export interface IComment {
     NV106?: string;
     NV126?: string;
     createdAt?: Date;
-    reply?: IReply[] | IReply;
+    reply?: IReply[];
 }

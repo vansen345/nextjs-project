@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider refetchInterval={60} refetchOnWindowFocus={true}>
+    <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
       <Provider store={store}>
         <StyleProvider hashPriority="high">
           {children}
