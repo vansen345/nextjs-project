@@ -12,7 +12,8 @@ export async function generateMetadata(
 
   if (!conversationId) {
     return {
-      title: "PiepMe: Tin nhắn",
+      // title: "PiepMe: Tin nhắn",
+      title: "SenApp: Tin nhắn",
     };
   }
 
@@ -20,7 +21,8 @@ export async function generateMetadata(
   const userName = "Tin nhắn";
 
   return {
-    title: `PiepMe: ${userName}`,
+    // title: `PiepMe: ${userName}`,
+    title: `SenApp: ${userName}`,
   };
 }
 

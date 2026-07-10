@@ -48,7 +48,8 @@ export async function generateMetadata({
   const profile = await fetchProfile(Number(FO100), myFO100);
 
   return {
-    title: `PiepMe: ${profile?.NV106 ?? "Profile"}`,
+    // title: `PiepMe: ${profile?.NV106 ?? "Profile"}`,
+    title: `SenApp: ${profile?.NV106 ?? "Profile"}`,
   };
 }
 

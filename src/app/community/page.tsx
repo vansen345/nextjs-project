@@ -1,7 +1,8 @@
 import HomePageScreen from "@/lib/ui/home/home_page_screen";
 
 export const metadata = {
-  title: "PiepMe: Cộng đồng",
+  // title: "PiepMe: Cộng đồng",
+  title: "SenApp: Cộng đồng",
 };
 export default function Page() {
   return <HomePageScreen />;
