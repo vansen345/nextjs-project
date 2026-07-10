@@ -1,5 +1,7 @@
 import { useAuth } from "@/lib/hook/useAuth";
-import { Avatar, Input } from "antd";
+import { Avatar, Popover } from "antd";
+import TextArea from "antd/es/input/TextArea";
+import EmojiPicker from "emoji-picker-react";
 
 export const InputComment = ({
   inputComment,
@@ -19,9 +21,42 @@ export const InputComment = ({
         style={{ cursor: "pointer" }}
         src={NV126 || null}
       />
-      <Input
+      <div className="input-comment relative flex-1 flex items-center bg-[#f4f4f4] rounded-lg">
+        <TextArea
+          placeholder="Nhập comment"
+          value={inputComment}
+          onChange={(e) => setInputComment(e.target.value)}
+          onPressEnter={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleInsertComment();
+            }
+          }}
+          autoSize={{ minRows: 1, maxRows: 4 }}
+          style={{ resize: "none" }}
+          classNames={{
+            textarea:
+              "!bg-[#f4f4f4] !outline-none !shadow-none !border-none focus:!outline-none focus:!shadow-none !pl-[10px] !leading-[35px] h-[42px]",
+          }}
+        />
+        <Popover
+          content={
+            <EmojiPicker
+              onEmojiClick={(emojiObject) => {
+                setInputComment(inputComment + emojiObject.emoji);
+              }}
+            />
+          }
+          trigger="click"
+          placement="topRight"
+        >
+          <span className="chat-btn-icon pr-2.5 fpme-emoji cursor-pointer shrink-0 text-[20px] text-[#8d8989] hover:text-[25px] transition-all duration-200" />
+        </Popover>
+      </div>
+
+      {/* <Input
         placeholder="Nhập comment"
-        value={inputComment}
+        value={inputComment}    
         onChange={(e) => setInputComment(e.target.value)}
         onPressEnter={(e) => {
           if (e.key === "Enter") {
@@ -33,7 +68,7 @@ export const InputComment = ({
           root: "flex-1 !bg-[#f4f4f4] !border-none !rounded-lg",
           input: "!bg-[#f4f4f4]",
         }}
-      />
+      /> */}
       <button
         onClick={handleInsertComment}
         disabled={inputComment.trim() === ""}

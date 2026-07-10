@@ -1,8 +1,9 @@
 import { useAuth } from "@/lib/hook/useAuth";
 import { getTimeText } from "@/lib/util";
 import { IComment } from "@/model/comment_type";
-import { Avatar, Dropdown, MenuProps } from "antd";
+import { Avatar, Dropdown, MenuProps, Popover } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import EmojiPicker from "emoji-picker-react";
 
 export const ListComment = ({
   listComment,
@@ -13,7 +14,7 @@ export const ListComment = ({
   setTextReply,
   onActionSendReply,
   onDeleteComment,
-  onCloseReply
+  onCloseReply,
 }: {
   listComment: IComment[];
   onReply: (comment: IComment) => void;
@@ -77,7 +78,7 @@ export const ListComment = ({
                   <span className="text-[17px]">
                     <i className="fpme-heart-line" />
                   </span>
-                  <span className="text-[12px] ml-1">3</span>
+                  <span className="text-[12px] ml-1">0</span>
                 </div>
                 <div
                   className="reply-comment cursor-pointer"
@@ -112,7 +113,7 @@ export const ListComment = ({
                           <span className="text-[17px]">
                             <i className="fpme-heart-line" />
                           </span>
-                          <span className="text-[12px] ml-1">3</span>
+                          <span className="text-[12px] ml-1">0</span>
                         </div>
                         <div
                           className="reply-comment cursor-pointer"
@@ -143,6 +144,12 @@ export const ListComment = ({
                         <TextArea
                           value={textReply}
                           onChange={(e) => setTextReply(e.target.value)}
+                          onPressEnter={(e) => {
+                            e.preventDefault();
+                            if (textReply.trim()) {
+                              onActionSendReply(textReply);
+                            }
+                          }}
                           classNames={{
                             root: "flex-1 !border-none !shadow-none !pl-0",
                             textarea: "!text-[14px] !p-0",
@@ -154,8 +161,25 @@ export const ListComment = ({
                       </div>
                     </div>
                   </div>
-                  <div className="action-reply flex justify-end gap-1">
-                    <button onClick={onCloseReply} type="button" className="bg-black w-7.5 h-7.5 rounded-[15px] cursor-pointer flex items-center justify-center">
+                  <div className="action-reply flex justify-end items-center gap-1">
+                    <Popover
+                      content={
+                        <EmojiPicker
+                          onEmojiClick={(emojiObject) => {
+                            setTextReply(textReply + emojiObject.emoji);
+                          }}
+                        />
+                      }
+                      trigger="click"
+                      placement="topRight"
+                    >
+                      <span className="chat-btn-icon pr-1.5 fpme-emoji cursor-pointer shrink-0 text-[20px] text-[#8d8989] hover:text-[25px] transition-all duration-200" />
+                    </Popover>
+                    <button
+                      onClick={onCloseReply}
+                      type="button"
+                      className="bg-black w-7.5 h-7.5 rounded-[15px] cursor-pointer flex items-center justify-center"
+                    >
                       <i className="fpme-close text-white text-[9px]"></i>
                     </button>
                     <button
