@@ -195,7 +195,7 @@ function CreatePiepScreen() {
               PV301.trim() === ""
             }
             onClick={checkEdit ? onEdit : onSubmitCreatePiep}
-            className="bg-[#f3495b] text-white px-4 py-2 rounded-lg cursor-pointer disabled:bg-[#f4f4f4] disabled:text-[#999] disabled:cursor-not-allowed"
+            className="bg-[#f3495b] text-white! px-4 py-2 rounded-lg cursor-pointer disabled:bg-[#f4f4f4] disabled:text-[#999]! disabled:cursor-not-allowed"
           >
             {checkEdit ? t("Lưu") : t("submit_post_create")}
           </button>

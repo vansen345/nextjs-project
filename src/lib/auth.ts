@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { createToken } from "./util";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -16,17 +17,24 @@ export const authOptions: NextAuthOptions = {
                 const normalizedEmail = parts.length === 2
                     ? `${parts[0]?.split('+')[0]}@${parts[1]}`
                     : credentials.email;
+                const payload = createToken({
+                    email: normalizedEmail,
+                    otp: credentials.otp,
+                });
 
+                console.log("🟡 Payload gửi đi:", JSON.stringify(payload));
                 const res = await fetch(`${process.env.API_BASE_URL}/email/verifyOtp`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        email: normalizedEmail, // ← dùng normalized
-                        otp: credentials.otp,
-                    }),
+                    body: JSON.stringify(
+                        payload
+                    ),
                 });
+                console.log("🔵 Status code:", res.status);
 
                 const data = await res.json();
+
+                console.log("🔵 Response data:", JSON.stringify(data));
 
                 if (data.status === "true" && data.elements === 1) {
                     const profileRes = await fetch(`${process.env.API_BASE_URL}/login/getInfoUserLogin`, {

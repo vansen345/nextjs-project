@@ -11,6 +11,7 @@
 //     return date.toLocaleDateString("vi-VN");
 // };
 import i18n from '@/i18n';
+import crypto from "crypto";
 
 export const pad2 = (num: number) => {
     return num.toString().padStart(2, '0');
@@ -21,7 +22,7 @@ export function formatPiepTime(dateString: string | Date): { val: string, mess: 
     if (!dateString) return { val: '', mess: 'time_just_now' };
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return { val: '', mess: 'time_just_now' };
-    
+
     const t = Math.floor((new Date().getTime() - date.getTime()) / 1000);
     if (t < 60) {
         return { val: '', mess: 'time_just_now' };
@@ -87,4 +88,68 @@ const timeLabels: Record<string, string> = {
     time_thursday: 'Thứ năm',
     time_friday: 'Thứ sáu',
     time_saturday: 'Thứ bảy',
+}
+
+type SignableValue =
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | SignableValue[]
+    | { [key: string]: SignableValue };
+
+function cleanString(value: string): string {
+    return value.replace(/[^a-zA-Z0-9]+/g, "");
+}
+
+function parseDouble(number: number): string {
+    return Number.isInteger(number) ? `${number}` : cleanString(`${number}`);
+}
+
+function formatData(k: string | number, v: SignableValue): string {
+    if (typeof v === "string") return `${k}=${cleanString(v)}`;
+    if (typeof v === "number" && !Number.isInteger(v)) {
+        return `${k}=${parseDouble(v)}`;
+    }
+    if (Array.isArray(v)) {
+        return `${k}=[${v.map((item, i) => formatData(i, item)).join("&")}]`;
+    }
+    if (v !== null && typeof v === "object") {
+        return `${k}=[${sortKey2(v)}]`;
+    }
+    return `${k}=${cleanString(`{${v}}`)}`;
+}
+
+function sortKey2(data: Record<string, SignableValue>): string {
+    const sortedKeys = Object.keys(data).sort((a, b) => a.localeCompare(b));
+    return sortedKeys.map((k) => formatData(k, data[k])).join("&");
+}
+
+function generateMd5(input: string): string {
+    return crypto.createHash("md5").update(input).digest("hex");
+}
+
+export function createToken(
+    data: Record<string, SignableValue>
+): Record<string, SignableValue> {
+    const merged: Record<string, SignableValue> = {
+        ...data,
+        MODEL: "web",
+        SRC: "web",
+        OS: "web",
+        VERSION: process.env.SIGNING_APP_VERSION ?? "1.0.0",
+        PROV: "CA",
+        APP: "PiepMe",
+    };
+
+    const dataForHash: Record<string, SignableValue> = {
+        ...merged,
+        v: process.env.SIGNING_VERSION_TOKEN ?? "",
+        keyToken: process.env.SIGNING_SALT ?? "",
+    };
+
+    const token = generateMd5(sortKey2(dataForHash));
+
+    return { ...merged, token };
 }
