@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
 
                 console.log("🔵 Response data:", JSON.stringify(data));
 
-                if (data.status === "true" && data.elements === 1) {
+                if (data.status === "true" && data.elements) {
                     const profileRes = await fetch(`${process.env.API_BASE_URL}/login/getInfoUserLogin`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -52,6 +52,8 @@ export const authOptions: NextAuthOptions = {
                         NV126: profile.elements?.NV126 || "",
                         NV106: profile.elements?.NV106 || "",
                         FO100: profile.elements?.FO100 || 0,
+                        accessToken:
+                            data.elements.accessToken || "",
                     };
                 }
 
@@ -66,6 +68,7 @@ export const authOptions: NextAuthOptions = {
                 token.NV106 = user.NV106;
                 token.id = user.id;
                 token.FO100 = user.FO100;
+                token.accessToken = user.accessToken;
             }
 
             if (trigger === "update" && session) {
@@ -80,6 +83,8 @@ export const authOptions: NextAuthOptions = {
             session.user.NV106 = token.NV106 as string;
             session.user.id = token.id as string;
             session.user.FO100 = token.FO100 as number;
+            session.accessToken =
+                token.accessToken as string;
             return session;
         },
     },
