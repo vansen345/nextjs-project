@@ -25,11 +25,7 @@ export default function RootLayout({
           <NotificationProvider />
           <Header />
           <section className="flex flex-col gap-6 place-content-center bg-[#f2f2f6] grow relative max-lg:px-5 max-lg:gap-4 pt-20">
-            {/* <div className="bg-layer bg-layer-1" />
-            <div className="bg-layer bg-layer-4" />
-            <div className="bg-layer bg-layer-5" />
-            <div className="bg-layer bg-layer-2" />
-            <div className="bg-layer bg-layer-3" /> */}
+         
             {children}
           </section>
         </Providers>
